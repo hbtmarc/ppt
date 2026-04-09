@@ -877,18 +877,22 @@ class FirebaseUI {
         card.innerHTML = `
             <div class="ppt-card-info">
                 <div class="ppt-card-title">${this._esc(ppt.title)}</div>
-                <div class="ppt-card-meta">${slideCount} slide${slideCount!==1?'s':''} ${ppt.author?'· '+this._esc(ppt.author):''} ${date?'· '+date:''}</div>
+                <div class="ppt-card-meta">${slideCount} slide${slideCount!==1?'s':''} ${ppt.author?'\u00b7 '+this._esc(ppt.author):''} ${date?'\u00b7 '+date:''}</div>
             </div>
             <div class="ppt-card-actions">
-                <button class="ppt-card-btn" data-action="load" title="Abrir">▶ Abrir</button>
-                ${this.isAdmin ? `<button class="ppt-card-btn" data-action="edit" title="Editar">✏️</button>` : ''}
-                ${this.isAdmin ? `<button class="ppt-card-btn danger" data-action="delete" title="Excluir">🗑</button>` : ''}
+                <button class="ppt-card-btn" data-action="load" title="Abrir">&#9654; Abrir</button>
+                ${this.isAdmin ? `<button class="ppt-card-btn" data-action="edit" title="Editar">&#9998;&#65039;</button>` : ''}
+                <button class="ppt-card-btn ppt-card-btn--dl" data-action="pdf"  title="Baixar PDF">&#128196; PDF</button>
+                <button class="ppt-card-btn ppt-card-btn--dl" data-action="pptx" title="Baixar PPTX">&#128202; PPTX</button>
+                ${this.isAdmin ? `<button class="ppt-card-btn danger" data-action="delete" title="Excluir">&#128465;</button>` : ''}
             </div>
         `;
 
-        card.querySelector('[data-action="load"]')?.addEventListener('click', () => this._loadPresentation(ppt.id, ppt.title));
-        card.querySelector('[data-action="edit"]')?.addEventListener('click', () => this._openEditPpt(ppt));
+        card.querySelector('[data-action="load"]')?.addEventListener('click',   () => this._loadPresentation(ppt.id, ppt.title));
+        card.querySelector('[data-action="edit"]')?.addEventListener('click',   () => this._openEditPpt(ppt));
         card.querySelector('[data-action="delete"]')?.addEventListener('click', () => this._deletePpt(ppt));
+        card.querySelector('[data-action="pdf"]')?.addEventListener('click',    () => this._downloadPresentation(ppt.id, ppt.title, 'pdf'));
+        card.querySelector('[data-action="pptx"]')?.addEventListener('click',   () => this._downloadPresentation(ppt.id, ppt.title, 'pptx'));
 
         return card;
     }
@@ -1730,6 +1734,162 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
     /* ── Template de slide (legado, mantido) ── */
     _slideTemplate() {
         return this._getTemplates()[1].html;
+    }
+
+    /* ================================================================
+       EXPORTAÇÃO: PDF e PPTX
+       ================================================================ */
+
+    /** Carrega uma biblioteca CDN de forma lazy (retorna Promise). */
+    _loadScript(url) {
+        return new Promise((resolve, reject) => {
+            if (document.querySelector(`script[src="${url}"]`)) { resolve(); return; }
+            const s = document.createElement('script');
+            s.src = url;
+            s.onload  = resolve;
+            s.onerror = () => reject(new Error('Falha ao carregar: ' + url));
+            document.head.appendChild(s);
+        });
+    }
+
+    _showExportProgress(title, msg, pct = 0) {
+        document.getElementById('export-progress-title').textContent = title;
+        document.getElementById('export-progress-msg').textContent   = msg;
+        document.getElementById('export-progress-bar').style.width   = pct + '%';
+        document.getElementById('modal-export-progress')?.classList.remove('hidden');
+    }
+    _updateExportProgress(msg, pct) {
+        if (document.getElementById('export-progress-msg'))
+            document.getElementById('export-progress-msg').textContent = msg;
+        if (document.getElementById('export-progress-bar'))
+            document.getElementById('export-progress-bar').style.width = pct + '%';
+    }
+    _hideExportProgress() {
+        document.getElementById('modal-export-progress')?.classList.add('hidden');
+    }
+
+    /** Renderiza cada slide em um div oculto e captura como PNG via html2canvas. */
+    async _renderSlidesToImages(slides, onProgress) {
+        const W = 1280, H = 720;
+
+        // Criar contêiner de renderização off-screen
+        const wrap = document.createElement('div');
+        wrap.style.cssText = `position:fixed;left:-${W + 40}px;top:0;width:${W}px;height:${H}px;overflow:hidden;z-index:-9999;pointer-events:none;`;
+        document.body.appendChild(wrap);
+
+        const images = [];
+        try {
+            for (let i = 0; i < slides.length; i++) {
+                const slide = slides[i];
+                const cls   = (slide.slideClasses || '').trim();
+                wrap.innerHTML = `
+                    <section class="slide active${cls ? ' ' + cls : ''}" style="
+                        position:absolute!important;inset:0!important;display:flex!important;
+                        opacity:1!important;width:${W}px!important;height:${H}px!important;
+                        animation:none!important;transition:none!important;">
+                        ${slide.content || ''}
+                    </section>`;
+
+                // Aguarda imagens externas carregarem
+                await Promise.allSettled(
+                    [...wrap.querySelectorAll('img')].map(img =>
+                        img.complete ? Promise.resolve() :
+                        new Promise(r => { img.onload = img.onerror = r; })
+                    )
+                );
+                await new Promise(r => setTimeout(r, 120)); // reflow extra
+
+                const canvas = await html2canvas(wrap, {
+                    width: W, height: H, x: 0, y: 0,
+                    useCORS: true, allowTaint: true,
+                    logging: false, scale: 1,
+                    backgroundColor: '#ffffff'
+                });
+                images.push(canvas.toDataURL('image/jpeg', 0.93)); // JPEG menor
+                if (onProgress) onProgress(i + 1, slides.length);
+            }
+        } finally {
+            document.body.removeChild(wrap);
+        }
+        return images;
+    }
+
+    async _downloadPresentation(pptId, title, format) {
+        const svc = window.FirebaseService;
+        const label = format === 'pdf' ? 'PDF' : 'PPTX';
+        this._showExportProgress(`Gerando ${label}\u2026`, 'Carregando slides do banco\u2026', 5);
+
+        try {
+            // 1. Buscar slides
+            const slides = await svc.Slides.list(pptId);
+            if (!slides.length) {
+                this._hideExportProgress();
+                alert('Esta apresentação não tem slides.');
+                return;
+            }
+
+            // 2. Carregar html2canvas
+            this._updateExportProgress('Carregando motor de renderização\u2026', 10);
+            if (typeof html2canvas === 'undefined') {
+                await this._loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+            }
+
+            // 3. Carregar biblioteca do formato
+            if (format === 'pdf') {
+                this._updateExportProgress('Carregando jsPDF\u2026', 15);
+                if (!window.jspdf) {
+                    await this._loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js');
+                }
+            } else {
+                this._updateExportProgress('Carregando PptxGenJS\u2026', 15);
+                if (typeof PptxGenJS === 'undefined') {
+                    await this._loadScript('https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js');
+                }
+            }
+
+            // 4. Renderizar slides
+            this._updateExportProgress('Renderizando slides\u2026', 20);
+            const images = await this._renderSlidesToImages(slides, (done, total) => {
+                const pct = 20 + Math.round((done / total) * 65);
+                this._updateExportProgress(`Slide ${done} de ${total}\u2026`, pct);
+            });
+
+            // 5. Gerar arquivo
+            this._updateExportProgress(`Montando ${label}\u2026`, 88);
+            const safeTitle = title.replace(/[\\/:*?"<>|]/g, '_');
+
+            if (format === 'pdf') {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'px',
+                    format: [1280, 720],
+                    compress: true
+                });
+                images.forEach((img, i) => {
+                    if (i > 0) pdf.addPage([1280, 720], 'landscape');
+                    pdf.addImage(img, 'JPEG', 0, 0, 1280, 720);
+                });
+                pdf.save(`${safeTitle}.pdf`);
+            } else {
+                const pptx = new PptxGenJS();
+                pptx.layout = 'LAYOUT_16x9';
+                pptx.title   = title;
+                for (const img of images) {
+                    const sl = pptx.addSlide();
+                    sl.addImage({ data: img, x: 0, y: 0, w: '100%', h: '100%' });
+                }
+                await pptx.writeFile({ fileName: safeTitle });
+            }
+
+            this._updateExportProgress(`${label} gerado com sucesso!`, 100);
+            setTimeout(() => this._hideExportProgress(), 1000);
+
+        } catch (err) {
+            this._hideExportProgress();
+            console.error('[Export]', err);
+            alert(`Erro ao gerar ${label}: ${err.message}`);
+        }
     }
 
     /* ── Utilitários ── */

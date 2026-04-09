@@ -1617,15 +1617,37 @@ button, .nav-button { cursor: pointer; }
    EDITOR DE SLIDE — PAINEL DIVIDIDO
    ============================================ */
 
-/* Modal extra-largo para o editor */
+/* Modal fullscreen para o editor */
 .ppt-modal-box--editor {
-    max-width: 1320px;
-    width: 96vw;
-    height: 90vh;
+    max-width:  100vw;
+    width:      100vw;
+    height:     100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1rem 1.25rem;
     display: flex;
     flex-direction: column;
     gap: .75rem;
     overflow: hidden;
+    animation: none;
+}
+/* Botão X do editor fullscreen — maior e fixo */
+.ppt-modal-box--editor .ppt-modal-close {
+    width:  2.2rem;
+    height: 2.2rem;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border-radius: 50%;
+    color: #374151;
+    font-weight: 700;
+}
+.ppt-modal-box--editor .ppt-modal-close:hover {
+    background: #fecaca;
+    color: #b91c1c;
 }
 
 /* Linha de campos (título + fundo) */
@@ -1765,6 +1787,42 @@ button, .nav-button { cursor: pointer; }
     flex-shrink: 0;
 }
 .preview-dot.updating { color: #fbbf24; }
+
+/* ============================================
+   EXPORT PROGRESS OVERLAY
+   ============================================ */
+.export-spinner {
+    width: 52px; height: 52px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #008542;
+    border-radius: 50%;
+    margin: 0 auto;
+    animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.export-progress-track {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+.export-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #008542, #00a552);
+    border-radius: 999px;
+    transition: width .3s ease;
+}
+
+/* Botões de download no card de apresentação */
+.ppt-card-btn--dl {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+    font-weight: 700;
+}
+.ppt-card-btn--dl:hover { background: #dcfce7; border-color: #86efac; }
 
 /* Erro */
 .ppt-error {

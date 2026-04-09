@@ -1056,6 +1056,21 @@
     </div>
 </div>
 
+<!-- =============================================
+     OVERLAY: PROGRESSO DE EXPORTAÇÃO
+     ============================================= -->
+<div id="modal-export-progress" class="ppt-modal hidden" role="dialog" aria-modal="true" aria-live="polite">
+    <div class="ppt-modal-backdrop"></div>
+    <div class="ppt-modal-box" style="max-width:340px;text-align:center;gap:1.25rem;padding:2rem 1.75rem;">
+        <h2 id="export-progress-title" style="font-size:1.15rem;font-weight:700;color:#111827;margin:0;">Gerando arquivo…</h2>
+        <div class="export-spinner"></div>
+        <p id="export-progress-msg" style="font-size:.875rem;color:#6b7280;margin:0;">Preparando slides…</p>
+        <div class="export-progress-track">
+            <div id="export-progress-bar" class="export-progress-fill" style="width:0%"></div>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts -->
 <script type="module" src="firebase.js"></script>
 <script src="script.js"></script>
