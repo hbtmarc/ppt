@@ -1831,14 +1831,14 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
             // 2. Carregar html2canvas
             this._updateExportProgress('Carregando motor de renderização\u2026', 10);
             if (typeof html2canvas === 'undefined') {
-                await this._loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+                await this._loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
             }
 
             // 3. Carregar biblioteca do formato
             if (format === 'pdf') {
                 this._updateExportProgress('Carregando jsPDF\u2026', 15);
                 if (!window.jspdf) {
-                    await this._loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js');
+                    await this._loadScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
                 }
             } else {
                 this._updateExportProgress('Carregando PptxGenJS\u2026', 15);

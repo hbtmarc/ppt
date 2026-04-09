@@ -2065,4 +2065,35 @@ button, .nav-button { cursor: pointer; }
 .tpl-prev--cards-icon { background: linear-gradient(135deg, #eff6ff 0%, #ecfdf5 100%); color: #374151; }
 .tpl-prev--acoes      { background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%); color: #374151; }
 
+/* ============================================
+   ANIMAÇÕES SVG — ILUSTRAÇÕES DE APRESENTAÇÃO
+   (compartilhadas entre fadiga.html e qualquer
+   slide salvo no Firebase)
+   ============================================ */
+@keyframes svgBrainPulse  { 0%,100%{transform:scale(1)}    50%{transform:scale(1.04)} }
+@keyframes svgEyeDroop    { 0%,40%,60%,100%{transform:scaleY(1)} 50%{transform:scaleY(.25)} }
+@keyframes svgDotBlink    { 0%,100%{opacity:1} 50%{opacity:.2} }
+@keyframes svgMoonFloat   { 0%,100%{transform:translateY(0)}  50%{transform:translateY(-4px)} }
+@keyframes svgStarTwinkle { 0%,100%{opacity:1} 50%{opacity:.25} }
+@keyframes svgClockHand   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes svgWarnPulse   { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.7;transform:scale(1.06)} }
+@keyframes svgArrowSlide  { 0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)} }
+@keyframes svgCycleSpin   { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes svgSunRays     { 0%,100%{opacity:.6;transform:scale(1)} 50%{opacity:1;transform:scale(1.08)} }
+
+.svga-brain  { animation: svgBrainPulse  3.5s ease-in-out infinite; transform-origin: 50% 50%; }
+.svga-eye    { animation: svgEyeDroop    4s   ease-in-out infinite; transform-origin: 50% 100%; }
+.svga-blink  { animation: svgDotBlink    1.8s ease-in-out infinite; }
+.svga-moon   { animation: svgMoonFloat   4s   ease-in-out infinite; }
+.svga-star1  { animation: svgStarTwinkle 2.2s ease-in-out infinite; }
+.svga-star2  { animation: svgStarTwinkle 2.2s .8s  ease-in-out infinite; }
+.svga-star3  { animation: svgStarTwinkle 2.2s 1.6s ease-in-out infinite; }
+.svga-clock  { animation: svgClockHand   5s   linear   infinite; transform-origin: 40px 40px; }
+.svga-warn   { animation: svgWarnPulse   2.5s ease-in-out infinite; }
+.svga-arrow  { animation: svgArrowSlide  1.8s ease-in-out infinite; }
+.svga-cycle  { animation: svgCycleSpin   12s  linear   infinite; transform-origin: 50% 50%; }
+.svga-sun    { animation: svgSunRays     3s   ease-in-out infinite; transform-origin: 50% 50%; }
+
+/* .slide-illust e .illust-svg já definidos na seção SLIDE ILLUSTRATIONS acima */
+
 
