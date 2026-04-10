@@ -698,7 +698,30 @@ class FirebaseUI {
         svc.Auth.onStateChange((user, isAdmin) => {
             this.isAdmin = isAdmin;
             this._updateAdminUI(user, isAdmin);
+
+            // Auto-carregar a última apresentação salva (uma vez)
+            if (!this._autoLoaded) {
+                this._autoLoaded = true;
+                this._autoLoadLatest();
+            }
         });
+    }
+
+    /** Carrega automaticamente a apresentação mais recente do Firebase */
+    async _autoLoadLatest() {
+        try {
+            const svc = window.FirebaseService;
+            if (!svc) return;
+            const list = await svc.Presentations.list();
+            if (!list.length) return; // nenhuma apresentação salva — manter local
+
+            // Encontrar a mais recentemente atualizada
+            const latest = list.reduce((a, b) => ((b.updatedAt || 0) > (a.updatedAt || 0) ? b : a), list[0]);
+            await this._loadPresentation(latest.id, latest.title);
+        } catch (err) {
+            console.warn('[AutoLoad] Falha ao carregar última apresentação:', err.message);
+            // Falha silenciosa — mantém o conteúdo local
+        }
     }
 
     _updateAdminUI(user, isAdmin) {
@@ -737,11 +760,26 @@ class FirebaseUI {
         document.getElementById('modal-save-current-close')?.addEventListener('click', () => this._closeModal('modal-save-current'));
         document.getElementById('btn-cancel-save-current')?.addEventListener('click',  () => this._closeModal('modal-save-current'));
 
+        /* Roteiro modal */
+        document.getElementById('modal-roteiro-close')?.addEventListener('click', () => this._closeModal('modal-roteiro'));
+        document.getElementById('btn-roteiro-copy')?.addEventListener('click', () => {
+            if (this._roteiroText) {
+                this._copyToClipboard(this._roteiroText).then(() => {
+                    const s = document.getElementById('roteiro-status');
+                    if (s) { s.textContent = '\u2705 Copiado!'; setTimeout(() => { s.textContent = ''; }, 3000); }
+                });
+            }
+        });
+        document.getElementById('btn-roteiro-download')?.addEventListener('click', () => this._downloadRoteiroFile());
+
+        /* Fechar dropdown de download ao clicar fora */
+        document.addEventListener('click', () => this._closeDlMenus());
+
         /* Fechar ao clicar no backdrop — fecha APENAS o modal mais alto visível */
         document.querySelectorAll('.ppt-modal-backdrop').forEach(bd => {
             bd.addEventListener('click', () => {
                 // Ordem: do mais alto para o mais baixo
-                const stack = ['modal-templates','modal-save-current','modal-edit-slide','modal-edit-ppt','modal-presentations'];
+                const stack = ['modal-templates','modal-save-current','modal-roteiro','modal-edit-slide','modal-edit-ppt','modal-presentations'];
                 for (const id of stack) {
                     if (!document.getElementById(id)?.classList.contains('hidden')) {
                         this._closeModal(id);
@@ -816,7 +854,7 @@ class FirebaseUI {
         /* ESC fecha modal no topo */
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
-                const stack = ['modal-templates','modal-edit-slide','modal-edit-ppt','modal-save-current','modal-presentations'];
+                const stack = ['modal-templates','modal-roteiro','modal-edit-slide','modal-edit-ppt','modal-save-current','modal-presentations'];
                 for (const id of stack) {
                     if (!document.getElementById(id)?.classList.contains('hidden')) {
                         this._closeModal(id);
@@ -834,7 +872,7 @@ class FirebaseUI {
     _closeModal(id) {
         document.getElementById(id)?.classList.add('hidden');
         // Só restaura scroll se nenhum modal estiver aberto
-        const any = ['modal-presentations','modal-edit-ppt','modal-edit-slide','modal-templates','modal-save-current']
+        const any = ['modal-presentations','modal-edit-ppt','modal-edit-slide','modal-templates','modal-save-current','modal-roteiro']
             .some(m => !document.getElementById(m)?.classList.contains('hidden'));
         if (!any) document.body.style.overflow = '';
     }
@@ -895,26 +933,49 @@ class FirebaseUI {
         const date = ppt.updatedAt ? new Date(ppt.updatedAt).toLocaleDateString('pt-BR') : '';
 
         card.innerHTML = `
-            <div class="ppt-card-info">
-                <div class="ppt-card-title">${this._esc(ppt.title)}</div>
-                <div class="ppt-card-meta">${slideCount} slide${slideCount!==1?'s':''} ${ppt.author?'\u00b7 '+this._esc(ppt.author):''} ${date?'\u00b7 '+date:''}</div>
-            </div>
-            <div class="ppt-card-actions">
-                <button class="ppt-card-btn" data-action="load" title="Abrir">&#9654; Abrir</button>
-                ${this.isAdmin ? `<button class="ppt-card-btn" data-action="edit" title="Editar">&#9998;&#65039;</button>` : ''}
-                <button class="ppt-card-btn ppt-card-btn--dl" data-action="pdf"  title="Baixar PDF">&#128196; PDF</button>
-                <button class="ppt-card-btn ppt-card-btn--dl" data-action="pptx" title="Baixar PPTX">&#128202; PPTX</button>
-                ${this.isAdmin ? `<button class="ppt-card-btn danger" data-action="delete" title="Excluir">&#128465;</button>` : ''}
+            <div class="ppt-card-row">
+                <div class="ppt-card-info">
+                    <div class="ppt-card-title">${this._esc(ppt.title)}</div>
+                    <div class="ppt-card-meta">${slideCount} slide${slideCount!==1?'s':''} ${ppt.author?'\u00b7 '+this._esc(ppt.author):''} ${date?'\u00b7 '+date:''}</div>
+                </div>
+                <div class="ppt-card-actions">
+                    <button class="ppt-card-btn" data-action="load" title="Abrir">&#9654; Abrir</button>
+                    ${this.isAdmin ? `<button class="ppt-card-btn" data-action="edit" title="Editar">&#9998;&#65039;</button>` : ''}
+                    <div class="ppt-dl-wrap">
+                        <button class="ppt-dl-trigger" data-action="dl-toggle">&#11015; Baixar</button>
+                        <div class="ppt-dl-menu">
+                            <button class="ppt-dl-item" data-action="pdf">&#128196; Baixar PDF</button>
+                            <button class="ppt-dl-item" data-action="pptx">&#128202; Baixar PPTX</button>
+                            <button class="ppt-dl-item" data-action="roteiro">&#128221; Ver Roteiro</button>
+                        </div>
+                    </div>
+                    ${this.isAdmin ? `<button class="ppt-card-btn danger" data-action="delete" title="Excluir">&#128465;</button>` : ''}
+                </div>
             </div>
         `;
 
         card.querySelector('[data-action="load"]')?.addEventListener('click',   () => this._loadPresentation(ppt.id, ppt.title));
         card.querySelector('[data-action="edit"]')?.addEventListener('click',   () => this._openEditPpt(ppt));
         card.querySelector('[data-action="delete"]')?.addEventListener('click', () => this._deletePpt(ppt));
-        card.querySelector('[data-action="pdf"]')?.addEventListener('click',    () => this._downloadPresentation(ppt.id, ppt.title, 'pdf'));
-        card.querySelector('[data-action="pptx"]')?.addEventListener('click',   () => this._downloadPresentation(ppt.id, ppt.title, 'pptx'));
+        card.querySelector('[data-action="pdf"]')?.addEventListener('click',    () => { this._closeDlMenus(); this._downloadPresentation(ppt.id, ppt.title, 'pdf'); });
+        card.querySelector('[data-action="pptx"]')?.addEventListener('click',   () => { this._closeDlMenus(); this._downloadPresentation(ppt.id, ppt.title, 'pptx'); });
+        card.querySelector('[data-action="roteiro"]')?.addEventListener('click', () => { this._closeDlMenus(); this._openRoteiro(ppt.id, ppt.title); });
+
+        // Dropdown toggle
+        const dlTrigger = card.querySelector('[data-action="dl-toggle"]');
+        const dlMenu = card.querySelector('.ppt-dl-menu');
+        dlTrigger?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this._closeDlMenus(); // fecha outros abertos
+            dlMenu?.classList.toggle('open');
+        });
 
         return card;
+    }
+
+    /** Fecha todos os dropdown menus de download */
+    _closeDlMenus() {
+        document.querySelectorAll('.ppt-dl-menu.open').forEach(m => m.classList.remove('open'));
     }
 
     /* ── Carregar apresentação do banco ── */
@@ -1927,6 +1988,196 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
             console.error('[Export]', err);
             alert(`Erro ao gerar ${label}: ${err.message}`);
         }
+    }
+
+    /* ── Roteiro — gera texto, abre modal e copia ── */
+    async _openRoteiro(pptId, title) {
+        const svc = window.FirebaseService;
+        if (!svc) return alert('Firebase não conectado.');
+
+        const preEl     = document.getElementById('roteiro-content');
+        const statusEl  = document.getElementById('roteiro-status');
+        if (!preEl) return;
+
+        // Abrir modal imediatamente com loading
+        preEl.textContent = '⏳ Gerando roteiro…';
+        if (statusEl) statusEl.textContent = '';
+        this._openModal('modal-roteiro');
+
+        try {
+            const content = await this._buildRoteiroText(pptId, title);
+            preEl.textContent = content;
+            this._roteiroText = content;
+            this._roteiroTitle = title;
+
+            // Auto-copy
+            await this._copyToClipboard(content);
+            if (statusEl) {
+                statusEl.textContent = '✅ Copiado para a área de transferência!';
+                setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 4000);
+            }
+        } catch (err) {
+            preEl.textContent = `Erro: ${err.message}`;
+            console.error('[Roteiro]', err);
+        }
+    }
+
+    /** Gera o texto completo do roteiro */
+    async _buildRoteiroText(pptId, title) {
+        const svc = window.FirebaseService;
+        const ppt = await svc.Presentations.get(pptId);
+        const slides = await svc.Slides.list(pptId);
+        if (!slides.length) throw new Error('Esta apresentação não tem slides.');
+
+        const WORDS_PER_MIN = 150;
+        const lines = [];
+        const sep = '═'.repeat(60);
+        const sepLight = '─'.repeat(60);
+
+        lines.push(sep);
+        lines.push(`  ROTEIRO DE APRESENTAÇÃO`);
+        lines.push(sep);
+        lines.push('');
+        lines.push(`  Título:  ${ppt?.title || title}`);
+        if (ppt?.author) lines.push(`  Autor:   ${ppt.author}`);
+        if (ppt?.brand)  lines.push(`  Tema:    ${ppt.brand}`);
+        if (ppt?.description) lines.push(`  Resumo:  ${ppt.description}`);
+        lines.push(`  Slides:  ${slides.length}`);
+        lines.push(`  Gerado:  ${new Date().toLocaleString('pt-BR')}`);
+        lines.push('');
+        lines.push(sep);
+        lines.push('');
+
+        let totalWords = 0;
+
+        slides.forEach((slide, i) => {
+            const num = i + 1;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(slide.content || '', 'text/html');
+            const slideTitle = slide.title || `Slide ${num}`;
+            const sections = [];
+
+            const walk = (root) => {
+                for (const el of root.children) {
+                    const tag = el.tagName?.toLowerCase();
+                    if (['img', 'svg', 'script', 'style', 'canvas'].includes(tag)) continue;
+
+                    if (/^h[1-6]$/.test(tag) || el.classList?.contains('section-title') || el.classList?.contains('section-kicker')) {
+                        const txt = el.textContent?.trim();
+                        if (txt) sections.push({ type: 'heading', text: txt });
+                        continue;
+                    }
+                    if (tag === 'ul' || tag === 'ol') {
+                        const items = [...el.querySelectorAll('li')].map(li => li.textContent?.trim()).filter(Boolean);
+                        if (items.length) sections.push({ type: 'list', items });
+                        continue;
+                    }
+                    if (el.classList?.contains('info-card') || el.classList?.contains('signal-card') || el.classList?.contains('warn-card') || el.classList?.contains('card')) {
+                        const txt = el.textContent?.trim();
+                        if (txt) sections.push({ type: 'card', text: txt });
+                        continue;
+                    }
+                    const txt = el.textContent?.trim();
+                    if (txt && txt.length > 1) {
+                        if (el.children.length > 1) { walk(el); } else { sections.push({ type: 'paragraph', text: txt }); }
+                    } else if (el.children.length) {
+                        walk(el);
+                    }
+                }
+            };
+            walk(doc.body);
+
+            const slideText = sections.map(s => s.type === 'list' ? s.items.join(' ') : s.text || '').join(' ');
+            const wordCount = slideText.split(/\s+/).filter(w => w.length > 0).length;
+            totalWords += wordCount;
+            const estMin = Math.max(0.5, wordCount / WORDS_PER_MIN);
+            const estLabel = estMin < 1 ? `~${Math.round(estMin * 60)}s` : `~${estMin.toFixed(1)} min`;
+
+            lines.push(`┌${'─'.repeat(58)}┐`);
+            lines.push(`│  SLIDE ${String(num).padStart(2, '0')} — ${slideTitle.substring(0, 44).padEnd(44)}│`);
+            lines.push(`│  Tempo estimado: ${estLabel.padEnd(39)}│`);
+            lines.push(`└${'─'.repeat(58)}┘`);
+            lines.push('');
+
+            if (!sections.length) {
+                lines.push('  (Slide sem conteúdo textual)');
+            } else {
+                sections.forEach(sec => {
+                    switch (sec.type) {
+                        case 'heading':  lines.push(`  ▸ ${sec.text}`); break;
+                        case 'list':     sec.items.forEach(item => lines.push(`    • ${item}`)); break;
+                        case 'card':     lines.push(`    ┆ ${sec.text}`); break;
+                        case 'paragraph': default:
+                            this._wordWrap(sec.text, 70).forEach(l => lines.push(`  ${l}`)); break;
+                    }
+                    lines.push('');
+                });
+            }
+            lines.push(sepLight);
+            lines.push('');
+        });
+
+        const totalMin = totalWords / WORDS_PER_MIN;
+        const totalLabel = totalMin < 1 ? `${Math.round(totalMin * 60)} segundos` : `${Math.round(totalMin)} minutos`;
+
+        lines.push('');
+        lines.push(sep);
+        lines.push(`  RESUMO DO ROTEIRO`);
+        lines.push(sep);
+        lines.push(`  Total de slides:        ${slides.length}`);
+        lines.push(`  Total de palavras:      ${totalWords}`);
+        lines.push(`  Tempo estimado (fala):  ${totalLabel}`);
+        lines.push(`  Velocidade média:       ${WORDS_PER_MIN} palavras/min`);
+        lines.push(sep);
+
+        return lines.join('\n');
+    }
+
+    /** Copia texto para clipboard com fallback */
+    async _copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+        } catch {
+            // Fallback para contextos sem HTTPS
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;opacity:0;';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+        }
+    }
+
+    /** Download do roteiro como .txt a partir do modal */
+    _downloadRoteiroFile() {
+        const text = this._roteiroText;
+        if (!text) return;
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${(this._roteiroTitle || 'Roteiro').replace(/[\\/:*?"<>|]/g, '_')} — Roteiro.txt`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+    }
+
+    /** Quebra texto em linhas de até maxLen caracteres */
+    _wordWrap(text, maxLen = 70) {
+        const words = text.split(/\s+/);
+        const lines = [];
+        let current = '';
+        for (const w of words) {
+            if (current.length + w.length + 1 > maxLen) {
+                lines.push(current);
+                current = w;
+            } else {
+                current = current ? current + ' ' + w : w;
+            }
+        }
+        if (current) lines.push(current);
+        return lines;
     }
 
     /* ── Utilitários ── */
