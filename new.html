@@ -22,7 +22,7 @@
     <main id="presentationCard">
         <div class="presentation-header">
             <div class="header-left">
-                <div class="brand-pill">DDSMS | Saúde e Segurança</div>
+                <div id="brand-pill" class="brand-pill">DDSMS | Saúde e Segurança</div>
                 <div id="slideIndicator" class="slide-indicator" aria-live="polite">1 / 10</div>
             </div>
             <div class="header-right">
@@ -400,38 +400,38 @@
         <div class="animated-item section-kicker mb-2">Roadmap</div>
         <h2 class="animated-item section-title text-gray-800 mb-8">Pr&oacute;ximos passos</h2>
         <div class="animated-item delay-1" style="position:relative;padding-bottom:1rem;">
-            <div style="position:absolute;top:28px;left:0;right:0;height:3px;background:linear-gradient(90deg,#008542 0%,#00A552 40%,#d1d5db 60%,#d1d5db 100%);border-radius:2px;"></div>
+            <div style="position:absolute;top:28px;left:0;right:0;height:3px;background:linear-gradient(90deg,#008542 0%,#00A552 40%,#d1d5db 60%,#d1d5db 100%);border-radius:2px;z-index:0;"></div>
             <div class="grid grid-cols-5 gap-3">
                 <div class="eqa-fadeup delay-1 flex flex-col items-center">
-                    <div style="width:56px;height:56px;background:#008542;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;box-shadow:0 4px 12px rgba(0,133,66,.3);">
+                    <div style="width:56px;height:56px;background:#008542;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;box-shadow:0 4px 12px rgba(0,133,66,.3);position:relative;z-index:1;">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2.2"><path d="M9 12l2 2 4-4M7 4h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
                     </div>
                     <div class="text-xs font-bold text-emerald-800 text-center">In&iacute;cio da utiliza&ccedil;&atilde;o</div>
                     <div style="margin-top:.4rem;padding:.2rem .6rem;background:#dcfce7;color:#065f46;border-radius:999px;font-size:.65rem;font-weight:700;">AGORA</div>
                 </div>
                 <div class="eqa-fadeup2 delay-1 flex flex-col items-center">
-                    <div style="width:56px;height:56px;background:#00A552;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;box-shadow:0 4px 12px rgba(0,165,82,.3);">
+                    <div style="width:56px;height:56px;background:#00A552;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;box-shadow:0 4px 12px rgba(0,165,82,.3);position:relative;z-index:1;">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2.2"><path d="M3 3v18h18M7 14l4-4 4 4 4-8"/></svg>
                     </div>
                     <div class="text-xs font-bold text-emerald-800 text-center">Acompanhamento inicial</div>
                     <div style="margin-top:.4rem;padding:.2rem .6rem;background:#dcfce7;color:#065f46;border-radius:999px;font-size:.65rem;font-weight:700;">SEM. 1-2</div>
                 </div>
                 <div class="eqa-fadeup3 delay-2 flex flex-col items-center">
-                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;">
+                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;position:relative;z-index:1;">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#6b7280" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </div>
                     <div class="text-xs font-bold text-gray-600 text-center">Canal para d&uacute;vidas</div>
                     <div style="margin-top:.4rem;padding:.2rem .6rem;background:#f3f4f6;color:#6b7280;border-radius:999px;font-size:.65rem;font-weight:700;">CONTINUO</div>
                 </div>
                 <div class="eqa-fadeup4 delay-2 flex flex-col items-center">
-                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;">
+                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;position:relative;z-index:1;">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#6b7280" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </div>
                     <div class="text-xs font-bold text-gray-600 text-center">Coleta de melhorias</div>
                     <div style="margin-top:.4rem;padding:.2rem .6rem;background:#f3f4f6;color:#6b7280;border-radius:999px;font-size:.65rem;font-weight:700;">MES 1</div>
                 </div>
                 <div class="eqa-fadeup5 delay-3 flex flex-col items-center">
-                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;">
+                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;position:relative;z-index:1;">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#6b7280" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     </div>
                     <div class="text-xs font-bold text-gray-600 text-center">Apoio &agrave; ado&ccedil;&atilde;o plena</div>
@@ -531,6 +531,7 @@
                     <div class="ppt-form-row"><label class="ppt-label">Título *</label><input type="text" id="edit-ppt-title" class="ppt-input" placeholder="Título"></div>
                     <div class="ppt-form-row"><label class="ppt-label">Descrição</label><textarea id="edit-ppt-desc" class="ppt-input ppt-textarea" rows="2"></textarea></div>
                     <div class="ppt-form-row"><label class="ppt-label">Autor</label><input type="text" id="edit-ppt-author" class="ppt-input"></div>
+                    <div class="ppt-form-row"><label class="ppt-label">Marca / Tema</label><input type="text" id="edit-ppt-brand" class="ppt-input" placeholder="Ex: DDSMS | Saúde e Segurança"></div>
                     <input type="hidden" id="edit-ppt-id">
                     <div id="edit-ppt-error" class="ppt-error hidden"></div>
                     <div class="ppt-form-actions"><button id="btn-save-ppt-meta" class="ppt-btn ppt-btn--primary">Salvar Informações</button></div>
@@ -572,14 +573,17 @@
                         <span class="slide-editor-bar-title">&#9000;&#65039; HTML</span>
                         <div class="toolbar-snips">
                             <button class="toolbar-btn" data-snip="kicker">Kicker</button>
-                            <button class="toolbar-btn" data-snip="title">H2</button>
+                            <button class="toolbar-btn" data-snip="title">H2 Título</button>
                             <button class="toolbar-btn" data-snip="lead">Lead</button>
                             <div class="toolbar-sep"></div>
-                            <button class="toolbar-btn" data-snip="card-success">✅ Card</button>
-                            <button class="toolbar-btn" data-snip="card-danger">⚠️ Card</button>
-                            <button class="toolbar-btn" data-snip="list">Lista</button>
+                            <button class="toolbar-btn" data-snip="card-success">Card ✅</button>
+                            <button class="toolbar-btn" data-snip="card-danger">Card ⚠️</button>
+                            <button class="toolbar-btn" data-snip="card-warning">Card 🟡</button>
                             <div class="toolbar-sep"></div>
-                            <button class="toolbar-btn toolbar-btn--format" id="btn-format-html">&#10024; Formatar</button>
+                            <button class="toolbar-btn" data-snip="list">Lista</button>
+                            <button class="toolbar-btn" data-snip="icon">Ícone</button>
+                            <div class="toolbar-sep"></div>
+                            <button class="toolbar-btn toolbar-btn--format" id="btn-format-html" title="Auto-indentar HTML">&#10024; Formatar</button>
                             <button class="toolbar-btn toolbar-btn--accent" id="btn-slide-template">&#127912; Templates</button>
                         </div>
                     </div>
@@ -628,6 +632,7 @@
             <div class="ppt-form-row" style="margin-top:.75rem;"><label class="ppt-label">Título *</label><input type="text" id="save-current-title" class="ppt-input" placeholder="Título da apresentação"></div>
             <div class="ppt-form-row"><label class="ppt-label">Descrição</label><input type="text" id="save-current-desc" class="ppt-input"></div>
             <div class="ppt-form-row"><label class="ppt-label">Autor</label><input type="text" id="save-current-author" class="ppt-input"></div>
+            <div class="ppt-form-row"><label class="ppt-label">Marca / Tema</label><input type="text" id="save-current-brand" class="ppt-input" placeholder="Ex: DDSMS | Saúde e Segurança"></div>
             <div id="save-current-error" class="ppt-error hidden"></div>
             <div class="ppt-form-actions">
                 <button id="btn-confirm-save-current" class="ppt-btn ppt-btn--primary">&#128190; Salvar no banco</button>

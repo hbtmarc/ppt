@@ -1625,137 +1625,173 @@ button, .nav-button { cursor: pointer; }
     max-height: 100vh;
     border-radius: 0;
     box-shadow: none;
-    padding: 1rem 1.25rem;
+    padding: .875rem 1.25rem;
     display: flex;
     flex-direction: column;
-    gap: .75rem;
+    gap: .625rem;
     overflow: hidden;
     animation: none;
+    background: #f8fafc;
 }
-/* Botão X do editor fullscreen — maior e fixo */
+
+/* Botão X do editor fullscreen */
 .ppt-modal-box--editor .ppt-modal-close {
     width:  2.2rem;
     height: 2.2rem;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f1f5f9;
+    background: rgba(255,255,255,.12);
     border-radius: 50%;
-    color: #374151;
+    color: #e2e8f0;
     font-weight: 700;
+    flex-shrink: 0;
 }
 .ppt-modal-box--editor .ppt-modal-close:hover {
-    background: #fecaca;
-    color: #b91c1c;
+    background: rgba(239,68,68,.25);
+    color: #fca5a5;
 }
 
-/* Linha de campos (título + fundo) */
+/* Cabeçalho do editor — fundo escuro para contraste */
+.ppt-modal-box--editor .ppt-modal-header {
+    background: #1e1e2e;
+    border-bottom: 1.5px solid #3d3d56;
+    border-radius: .625rem;
+    padding: .5rem .875rem;
+    margin: 0;
+    flex-shrink: 0;
+}
+.ppt-modal-box--editor .ppt-modal-header h2 {
+    color: #cdd6f4;
+    font-size: 1rem;
+}
+
+/* Linha de campos (título + fundo) — compact */
 .slide-fields-row {
     display: flex;
-    gap: .75rem;
-    flex-wrap: wrap;
+    gap: .625rem;
+    flex-wrap: nowrap;
     flex-shrink: 0;
+    align-items: flex-end;
+}
+.slide-fields-row .ppt-form-row { margin: 0; }
+.slide-fields-row .ppt-label {
+    font-size: .72rem;
+    color: #475569;
+    font-weight: 600;
+    margin-bottom: .2rem;
+}
+.slide-fields-row .ppt-input {
+    padding: .4rem .65rem;
+    font-size: .82rem;
 }
 
 /* Contêiner de divisão principal */
 .slide-editor-split {
     display: flex;
-    gap: .875rem;
+    gap: .75rem;
     flex: 1;
     min-height: 0;
     overflow: hidden;
 }
 
-/* Painel esquerdo — editor */
+/* Painel esquerdo — editor de código */
 .slide-editor-left {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 0;
     min-height: 0;
+    overflow: hidden;
 }
 
-/* Painel direito — preview */
+/* Painel direito — preview ao vivo */
 .slide-editor-right {
-    width: 46%;
+    width: 44%;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    gap: 0;
+    overflow: hidden;
 }
 
 /* Barra de ferramentas (topo de cada painel) */
 .slide-editor-bar {
     display: flex;
     align-items: center;
-    gap: .5rem;
-    padding: .4rem .6rem;
+    gap: .4rem;
+    padding: .35rem .6rem;
     background: #2a2a3c;
     border: 1.5px solid #3d3d56;
     border-bottom: none;
     border-radius: .6rem .6rem 0 0;
     flex-shrink: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow: hidden;
 }
 .slide-editor-bar-title {
-    font-size: .72rem;
+    font-size: .68rem;
     font-weight: 700;
     color: #89b4fa;
     text-transform: uppercase;
-    letter-spacing: .06em;
+    letter-spacing: .05em;
     white-space: nowrap;
-    margin-right: .25rem;
+    flex-shrink: 0;
+    margin-right: .15rem;
 }
 
-/* Snippets na toolbar */
+/* Snippets na toolbar — scrollável, sem wrap */
 .toolbar-snips {
     display: flex;
     align-items: center;
-    gap: .25rem;
-    flex-wrap: wrap;
+    gap: .22rem;
+    flex-wrap: nowrap;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
     flex: 1;
 }
+.toolbar-snips::-webkit-scrollbar { display: none; }
+
 .toolbar-btn {
     background: rgba(255,255,255,.07);
     color: #cdd6f4;
     border: 1px solid rgba(255,255,255,.1);
     border-radius: .3rem;
-    padding: .18rem .5rem;
-    font-size: .68rem;
+    padding: .16rem .45rem;
+    font-size: .67rem;
     font-weight: 600;
     cursor: pointer;
     transition: background .12s, border-color .12s;
     white-space: nowrap;
     font-family: inherit;
     line-height: 1.5;
+    flex-shrink: 0;
 }
 .toolbar-btn:hover {
     background: rgba(255,255,255,.15);
-    border-color: rgba(255,255,255,.25);
+    border-color: rgba(255,255,255,.3);
 }
 .toolbar-btn--accent {
     background: rgba(16,185,129,.18);
     border-color: rgba(16,185,129,.4);
     color: #6ee7b7;
+    flex-shrink: 0;
 }
-.toolbar-btn--accent:hover {
-    background: rgba(16,185,129,.32);
-}
+.toolbar-btn--accent:hover { background: rgba(16,185,129,.32); }
 .toolbar-btn--format {
     background: rgba(250,204,21,.12);
     border-color: rgba(250,204,21,.35);
     color: #fde68a;
+    flex-shrink: 0;
 }
-.toolbar-btn--format:hover {
-    background: rgba(250,204,21,.22);
-}
+.toolbar-btn--format:hover { background: rgba(250,204,21,.22); }
 .toolbar-sep {
     width: 1px;
-    height: 16px;
+    height: 14px;
     background: rgba(255,255,255,.15);
-    margin: 0 .1rem;
+    margin: 0 .05rem;
     flex-shrink: 0;
     align-self: center;
 }
@@ -1765,28 +1801,45 @@ button, .nav-button { cursor: pointer; }
     flex: 1;
     min-height: 0;
     position: relative;
-    border-radius: 0 0 .75rem .75rem;
+    border-radius: 0 0 .6rem .6rem;
     overflow: hidden;
     background: #0f172a;
     border: 1.5px solid #3d3d56;
     border-top: none;
+    display: flex;
+    flex-direction: column;
 }
 #slide-preview-frame {
     width: 100%;
-    height: 100%;
+    flex: 1;
     border: none;
     display: block;
+    min-height: 0;
 }
 
 /* Dot de status do preview */
 .preview-dot {
-    font-size: .85rem;
+    font-size: .8rem;
     color: #6ee7b7;
     line-height: 1;
     transition: color .25s;
     flex-shrink: 0;
 }
 .preview-dot.updating { color: #fbbf24; }
+
+/* Form actions dentro do editor — sempre visíveis no rodapé */
+.ppt-modal-box--editor .ppt-form-actions {
+    flex-shrink: 0;
+    border-top: 1px solid #e2e8f0;
+    padding-top: .625rem;
+    margin: 0;
+    background: #f8fafc;
+}
+/* Error no editor — não deve comprimir o split */
+.ppt-modal-box--editor .ppt-error {
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
 
 /* ============================================
    EXPORT PROGRESS OVERLAY
@@ -2109,6 +2162,9 @@ button, .nav-button { cursor: pointer; }
 @keyframes eqaProgress   { from{width:0} to{width:100%} }
 @keyframes eqaFadeUp     { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 @keyframes eqaBlipMove   { 0%{offset-distance:0%} 100%{offset-distance:100%} }
+
+/* Fix: roadmap step wrappers devem ficar acima da linha conectora posicionada absolutamente */
+[class*="eqa-fadeup"] { position: relative; z-index: 1; }
 
 .eqa-float     { animation: eqaFloat      3.2s ease-in-out infinite; }
 .eqa-pulse     { animation: eqaPulse      2.2s ease-in-out infinite; transform-origin:50% 50%; }

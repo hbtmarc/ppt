@@ -28,7 +28,7 @@
     <main id="presentationCard">
         <div class="presentation-header">
             <div class="header-left">
-                <div class="brand-pill">DDSMS | Saúde e Segurança</div>
+                <div id="brand-pill" class="brand-pill">DDSMS | Saúde e Segurança</div>
                 <div id="slideIndicator" class="slide-indicator" aria-live="polite">1 / 18</div>
             </div>
             <div class="header-right">
@@ -908,6 +908,10 @@
                     <label class="ppt-label">Autor</label>
                     <input type="text" id="edit-ppt-author" class="ppt-input" placeholder="Nome do autor">
                 </div>
+                <div class="ppt-form-row">
+                    <label class="ppt-label">Marca / Tema</label>
+                    <input type="text" id="edit-ppt-brand" class="ppt-input" placeholder="Ex: DDSMS | Saúde e Segurança">
+                </div>
                 <input type="hidden" id="edit-ppt-id">
                 <div id="edit-ppt-error" class="ppt-error hidden"></div>
                 <div class="ppt-form-actions">
@@ -1047,6 +1051,10 @@
         <div class="ppt-form-row">
             <label class="ppt-label">Autor</label>
             <input type="text" id="save-current-author" class="ppt-input" placeholder="Nome do autor">
+        </div>
+        <div class="ppt-form-row">
+            <label class="ppt-label">Marca / Tema</label>
+            <input type="text" id="save-current-brand" class="ppt-input" placeholder="Ex: DDSMS | Saúde e Segurança">
         </div>
         <div id="save-current-error" class="ppt-error hidden"></div>
         <div class="ppt-form-actions">

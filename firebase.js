@@ -143,6 +143,7 @@ const Presentations = {
             title: data.title || 'Nova Apresentação',
             description: data.description || '',
             author: data.author || '',
+            brand: data.brand || '',
             theme: data.theme || 'default',
             createdAt: now(),
             updatedAt: now(),

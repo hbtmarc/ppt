@@ -256,6 +256,7 @@ class SlideManager {
         // Não interfere quando um modal está aberto ou o foco está em input/textarea
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
         if (document.querySelector('.ppt-modal:not(.hidden)')) return;
+        if (document.getElementById('keyboard-help-overlay')) return;
 
         switch(e.key) {
             case 'ArrowRight':
@@ -518,14 +519,13 @@ class KeyboardShortcutsManager {
 
     init() {
         document.addEventListener('keydown', (e) => {
-            // Prevenir atalhos em campos de input (se houver)
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                return;
-            }
-            
-            // Atalhos disponíveis já implementados em outras classes
-            // Esta classe pode ser expandida para mostrar uma tela de ajuda
-            
+            // Prevenir atalhos em campos de input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            // Desativar quando qualquer modal estiver aberto
+            if (document.querySelector('.ppt-modal:not(.hidden)')) return;
+            // Desativar quando o overlay de ajuda estiver visível
+            if (document.getElementById('keyboard-help-overlay')) return;
+
             if (e.key === '?' || (e.shiftKey && e.key === '/')) {
                 e.preventDefault();
                 this.showHelpOverlay();
@@ -679,6 +679,7 @@ class FirebaseUI {
         this.modalSlide   = document.getElementById('modal-edit-slide');
         this.pptList      = document.getElementById('ppt-list');
         this.nameLabel    = document.getElementById('current-ppt-name');
+        this.brandLabel   = document.getElementById('brand-pill');
 
         this._bindEvents();
         this._watchAuth();
@@ -954,6 +955,9 @@ class FirebaseUI {
 
             this.currentPptId = id;
             if (this.nameLabel) this.nameLabel.textContent = title;
+            // Atualizar marca/tema se salvo na apresentação
+            const pptData = await svc.Presentations.get(id);
+            if (pptData?.brand && this.brandLabel) this.brandLabel.textContent = pptData.brand;
 
         } catch(e) {
             container.innerHTML = `<div style="padding:2rem;color:#ef4444;">Erro ao carregar: ${e.message}</div>`;
@@ -966,6 +970,8 @@ class FirebaseUI {
         document.getElementById('edit-ppt-title').value  = ppt?.title || '';
         document.getElementById('edit-ppt-desc').value   = ppt?.description || '';
         document.getElementById('edit-ppt-author').value = ppt?.author || '';
+        const brandInput = document.getElementById('edit-ppt-brand');
+        if (brandInput) brandInput.value = ppt?.brand || '';
 
         const label = document.getElementById('edit-ppt-title-label');
         if (label) label.textContent = ppt ? 'Editar Apresentação' : 'Nova Apresentação';
@@ -985,6 +991,7 @@ class FirebaseUI {
         const title  = document.getElementById('edit-ppt-title')?.value.trim();
         const desc   = document.getElementById('edit-ppt-desc')?.value.trim();
         const author = document.getElementById('edit-ppt-author')?.value.trim();
+        const brand  = document.getElementById('edit-ppt-brand')?.value.trim();
         const errBox = document.getElementById('edit-ppt-error');
         const btn    = document.getElementById('btn-save-ppt-meta');
         const svc    = window.FirebaseService;
@@ -994,12 +1001,14 @@ class FirebaseUI {
 
         try {
             if (id) {
-                await svc.Presentations.update(id, { title, description: desc, author });
+                await svc.Presentations.update(id, { title, description: desc, author, brand });
+                if (brand && this.brandLabel) this.brandLabel.textContent = brand;
             } else {
-                const newId = await svc.Presentations.create({ title, description: desc, author });
+                const newId = await svc.Presentations.create({ title, description: desc, author, brand });
                 document.getElementById('edit-ppt-id').value = newId;
                 document.getElementById('btn-add-slide')?.classList.remove('hidden');
                 document.getElementById('edit-ppt-title-label').textContent = 'Editar Apresentação';
+                if (brand && this.brandLabel) this.brandLabel.textContent = brand;
             }
             this._showSuccess(errBox, 'Salvo com sucesso!');
             this._refreshSlideList(document.getElementById('edit-ppt-id').value);
@@ -1121,10 +1130,13 @@ class FirebaseUI {
         const titleEl  = document.getElementById('save-current-title');
         const descEl   = document.getElementById('save-current-desc');
         const authorEl = document.getElementById('save-current-author');
+        const brandEl  = document.getElementById('save-current-brand');
         if (countEl)  countEl.textContent = slides.length;
         if (titleEl)  titleEl.value  = '';
         if (descEl)   descEl.value   = '';
         if (authorEl) authorEl.value = '';
+        // Pré-preenche com a marca atual exibida no header
+        if (brandEl)  brandEl.value  = this.brandLabel?.textContent || '';
         document.getElementById('save-current-error')?.classList.add('hidden');
         this._closeModal('modal-presentations');
         this._openModal('modal-save-current');
@@ -1134,6 +1146,7 @@ class FirebaseUI {
         const title  = document.getElementById('save-current-title')?.value.trim();
         const desc   = document.getElementById('save-current-desc')?.value.trim();
         const author = document.getElementById('save-current-author')?.value.trim();
+        const brand  = document.getElementById('save-current-brand')?.value.trim();
         const errBox = document.getElementById('save-current-error');
         const btn    = document.getElementById('btn-confirm-save-current');
         const svc    = window.FirebaseService;
@@ -1148,7 +1161,7 @@ class FirebaseUI {
         btn.textContent = 'Salvando...';
 
         try {
-            const pptId = await svc.Presentations.create({ title, description: desc, author });
+            const pptId = await svc.Presentations.create({ title, description: desc, author, brand });
 
             for (let i = 0; i < slideEls.length; i++) {
                 const el = slideEls[i];
@@ -1168,6 +1181,7 @@ class FirebaseUI {
             this._closeModal('modal-save-current');
             this.currentPptId = pptId;
             if (this.nameLabel) this.nameLabel.textContent = title;
+            if (brand && this.brandLabel) this.brandLabel.textContent = brand;
             // Feedback ao usuário
             const successBanner = document.createElement('div');
             successBanner.textContent = `✅ "${title}" salva com ${slideEls.length} slides no banco!`;
@@ -1210,6 +1224,7 @@ class FirebaseUI {
                 if (textarea) {
                     textarea.value = tpl.html;
                     textarea.focus();
+                    this._updateSlidePreview();
                 }
                 this._closeModal('modal-templates');
             });
@@ -1222,23 +1237,21 @@ class FirebaseUI {
             /* ── CAPA ── */
             {
                 key: 'capa', emoji: '🎯', name: 'Capa',
-                desc: 'Slide inicial com logos, título em destaque e subtítulo.',
-                html: `<section class="slide active gradient-bg text-center">
-    <div class="slide-content">
-        <div class="logos-container animated-item">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Logo_petrobras.gif" alt="Logo Petrobras">
-            <img src="https://www.agfengenharia.com.br/wp-content/uploads/2018/09/group-20668-211507.png" alt="Logo AGF Engenharia">
-        </div>
-        <div class="animated-item delay-1 section-kicker mb-4">DDSMS | Saúde e Segurança</div>
-        <h1 class="animated-item delay-2 section-title">
-            <span class="title-line">Título Principal</span>
-            <span class="title-line">Subtítulo com <span class="title-accent">Destaque</span></span>
-        </h1>
-        <p class="animated-item delay-3 mt-6 section-lead">
-            Mensagem de abertura que contextualiza o tema.
-        </p>
+                desc: 'Slide inicial com logos, título em destaque e subtítulo. Use fundo Gradiente verde.',
+                html: `<div class="slide-content">
+    <div class="logos-container animated-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Logo_petrobras.gif" alt="Logo Petrobras">
+        <img src="https://www.agfengenharia.com.br/wp-content/uploads/2018/09/group-20668-211507.png" alt="Logo AGF Engenharia">
     </div>
-</section>`
+    <div class="animated-item delay-1 section-kicker mb-4">DDSMS | Saúde e Segurança</div>
+    <h1 class="animated-item delay-2 section-title">
+        <span class="title-line">Título Principal</span>
+        <span class="title-line">Subtítulo com <span class="title-accent">Destaque</span></span>
+    </h1>
+    <p class="animated-item delay-3 mt-6 section-lead">
+        Mensagem de abertura que contextualiza o tema.
+    </p>
+</div>`
             },
 
             /* ── CONTEÚDO SIMPLES ── */
