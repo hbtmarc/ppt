@@ -642,6 +642,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('firebase-ready', (e) => {
         if (e.detail?.error) {
             console.error('[UI] Firebase falhou ao inicializar:', e.detail.error);
+            // Remover overlay se Firebase falhar
+            const ov = document.getElementById('autoload-overlay');
+            if (ov) { ov.style.opacity = '0'; setTimeout(() => ov.remove(), 350); }
             return;
         }
         initFirebaseUI();
@@ -657,6 +660,12 @@ document.addEventListener('DOMContentLoaded', function() {
             initFirebaseUI();
         }
     }, 3000);
+
+    // Fallback final: remover overlay se ainda estiver visível após 8s
+    setTimeout(() => {
+        const ov = document.getElementById('autoload-overlay');
+        if (ov) { ov.style.opacity = '0'; setTimeout(() => ov.remove(), 350); }
+    }, 8000);
 
     // Console Easter Egg
     console.log('%c💺 ERGONOMIA NO TRABALHO DIGITAL', 'font-size: 20px; color: #10b981; font-weight: bold;');
@@ -702,6 +711,7 @@ class FirebaseUI {
             // Auto-carregar a última apresentação salva (uma vez)
             if (!this._autoLoaded) {
                 this._autoLoaded = true;
+                this._showAutoLoadOverlay();
                 this._autoLoadLatest();
             }
         });
@@ -709,19 +719,39 @@ class FirebaseUI {
 
     /** Carrega automaticamente a apresentação mais recente do Firebase */
     async _autoLoadLatest() {
+        const container = document.querySelector('.slides-container');
         try {
             const svc = window.FirebaseService;
-            if (!svc) return;
+            if (!svc) { this._revealSlides(); return; }
             const list = await svc.Presentations.list();
-            if (!list.length) return; // nenhuma apresentação salva — manter local
+            if (!list.length) { this._revealSlides(); return; } // nenhuma apresentação salva — manter local
 
             // Encontrar a mais recentemente atualizada
             const latest = list.reduce((a, b) => ((b.updatedAt || 0) > (a.updatedAt || 0) ? b : a), list[0]);
             await this._loadPresentation(latest.id, latest.title);
+            this._revealSlides();
         } catch (err) {
             console.warn('[AutoLoad] Falha ao carregar última apresentação:', err.message);
             // Falha silenciosa — mantém o conteúdo local
+            this._revealSlides();
         }
+    }
+
+    /** Remove o overlay de carregamento e exibe os slides */
+    _revealSlides() {
+        if (this._autoLoadTimer) { clearTimeout(this._autoLoadTimer); this._autoLoadTimer = null; }
+        const overlay = document.getElementById('autoload-overlay');
+        if (overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.remove(), 350);
+        }
+    }
+
+    /** Ativa o overlay sobre os slides (já presente no HTML) e inicia timeout de segurança */
+    _showAutoLoadOverlay() {
+        // Overlay já está no HTML — apenas iniciar timeout de segurança
+        // Se demorar mais de 6s, revela conteúdo local
+        this._autoLoadTimer = setTimeout(() => this._revealSlides(), 6000);
     }
 
     _updateAdminUI(user, isAdmin) {
@@ -760,8 +790,13 @@ class FirebaseUI {
         document.getElementById('modal-save-current-close')?.addEventListener('click', () => this._closeModal('modal-save-current'));
         document.getElementById('btn-cancel-save-current')?.addEventListener('click',  () => this._closeModal('modal-save-current'));
 
-        /* Roteiro modal */
+        /* Roteiro modal — abas */
         document.getElementById('modal-roteiro-close')?.addEventListener('click', () => this._closeModal('modal-roteiro'));
+        document.querySelectorAll('.roteiro-tab').forEach(tab => {
+            tab.addEventListener('click', () => this._switchRoteiroTab(tab.dataset.tab));
+        });
+
+        /* Roteiro — aba auto (somente leitura) */
         document.getElementById('btn-roteiro-copy')?.addEventListener('click', () => {
             if (this._roteiroText) {
                 this._copyToClipboard(this._roteiroText).then(() => {
@@ -771,6 +806,18 @@ class FirebaseUI {
             }
         });
         document.getElementById('btn-roteiro-download')?.addEventListener('click', () => this._downloadRoteiroFile());
+
+        /* Roteiro — aba edição */
+        document.getElementById('btn-roteiro-save')?.addEventListener('click', () => this._saveRoteiro());
+        document.getElementById('btn-roteiro-copy-edit')?.addEventListener('click', () => {
+            const editor = document.getElementById('roteiro-editor');
+            if (editor?.value) {
+                this._copyToClipboard(editor.value).then(() => {
+                    const s = document.getElementById('roteiro-edit-status');
+                    if (s) { s.textContent = '\u2705 Copiado!'; setTimeout(() => { s.textContent = ''; }, 3000); }
+                });
+            }
+        });
 
         /* Fechar dropdown de download ao clicar fora */
         document.addEventListener('click', () => this._closeDlMenus());
@@ -940,13 +987,13 @@ class FirebaseUI {
                 </div>
                 <div class="ppt-card-actions">
                     <button class="ppt-card-btn" data-action="load" title="Abrir">&#9654; Abrir</button>
+                    <button class="ppt-card-btn" data-action="roteiro" title="Roteiro">&#128221;</button>
                     ${this.isAdmin ? `<button class="ppt-card-btn" data-action="edit" title="Editar">&#9998;&#65039;</button>` : ''}
                     <div class="ppt-dl-wrap">
                         <button class="ppt-dl-trigger" data-action="dl-toggle">&#11015; Baixar</button>
                         <div class="ppt-dl-menu">
                             <button class="ppt-dl-item" data-action="pdf">&#128196; Baixar PDF</button>
                             <button class="ppt-dl-item" data-action="pptx">&#128202; Baixar PPTX</button>
-                            <button class="ppt-dl-item" data-action="roteiro">&#128221; Ver Roteiro</button>
                         </div>
                     </div>
                     ${this.isAdmin ? `<button class="ppt-card-btn danger" data-action="delete" title="Excluir">&#128465;</button>` : ''}
@@ -955,11 +1002,11 @@ class FirebaseUI {
         `;
 
         card.querySelector('[data-action="load"]')?.addEventListener('click',   () => this._loadPresentation(ppt.id, ppt.title));
+        card.querySelector('[data-action="roteiro"]')?.addEventListener('click', () => this._openRoteiro(ppt.id, ppt.title));
         card.querySelector('[data-action="edit"]')?.addEventListener('click',   () => this._openEditPpt(ppt));
         card.querySelector('[data-action="delete"]')?.addEventListener('click', () => this._deletePpt(ppt));
         card.querySelector('[data-action="pdf"]')?.addEventListener('click',    () => { this._closeDlMenus(); this._downloadPresentation(ppt.id, ppt.title, 'pdf'); });
         card.querySelector('[data-action="pptx"]')?.addEventListener('click',   () => { this._closeDlMenus(); this._downloadPresentation(ppt.id, ppt.title, 'pptx'); });
-        card.querySelector('[data-action="roteiro"]')?.addEventListener('click', () => { this._closeDlMenus(); this._openRoteiro(ppt.id, ppt.title); });
 
         // Dropdown toggle
         const dlTrigger = card.querySelector('[data-action="dl-toggle"]');
@@ -1990,27 +2037,66 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
         }
     }
 
-    /* ── Roteiro — gera texto, abre modal e copia ── */
+    /* ── Roteiro — abre modal com abas ── */
     async _openRoteiro(pptId, title) {
         const svc = window.FirebaseService;
         if (!svc) return alert('Firebase não conectado.');
 
-        const preEl     = document.getElementById('roteiro-content');
-        const statusEl  = document.getElementById('roteiro-status');
+        this._roteiroPptId = pptId;
+        this._roteiroTitle = title;
+
+        // Abrir modal e resetar para aba "Meu Roteiro"
+        this._switchRoteiroTab('edit');
+        this._openModal('modal-roteiro');
+
+        // Carregar roteiro salvo na aba de edição
+        const editor = document.getElementById('roteiro-editor');
+        const editStatus = document.getElementById('roteiro-edit-status');
+        if (editor) {
+            editor.value = '';
+            editor.placeholder = '⏳ Carregando...';
+        }
+
+        try {
+            const pptData = await svc.Presentations.get(pptId);
+            if (editor) {
+                editor.value = pptData?.roteiro || '';
+                editor.placeholder = 'Escreva aqui suas falas, bulletpoints, anotações...\n\nDica: separe por slide usando títulos como:\n\n--- Slide 1: Capa ---\nBom dia a todos...\n\n--- Slide 2: Contexto ---\nO primeiro ponto...';
+            }
+        } catch (err) {
+            console.error('[Roteiro] Falha ao carregar:', err);
+            if (editStatus) editStatus.textContent = '⚠️ Erro ao carregar roteiro';
+        }
+    }
+
+    /** Alterna entre abas do roteiro */
+    _switchRoteiroTab(tabName) {
+        document.querySelectorAll('.roteiro-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+        document.getElementById('roteiro-tab-edit')?.classList.toggle('hidden', tabName !== 'edit');
+        document.getElementById('roteiro-tab-edit')?.classList.toggle('active', tabName === 'edit');
+        document.getElementById('roteiro-tab-auto')?.classList.toggle('hidden', tabName !== 'auto');
+        document.getElementById('roteiro-tab-auto')?.classList.toggle('active', tabName === 'auto');
+
+        // Se mudar para aba auto, gerar conteúdo
+        if (tabName === 'auto' && this._roteiroPptId) {
+            this._loadAutoRoteiro(this._roteiroPptId, this._roteiroTitle);
+        }
+    }
+
+    /** Gera roteiro automático e mostra na aba auto */
+    async _loadAutoRoteiro(pptId, title) {
+        const preEl = document.getElementById('roteiro-content');
+        const statusEl = document.getElementById('roteiro-status');
         if (!preEl) return;
 
-        // Abrir modal imediatamente com loading
         preEl.textContent = '⏳ Gerando roteiro…';
         if (statusEl) statusEl.textContent = '';
-        this._openModal('modal-roteiro');
 
         try {
             const content = await this._buildRoteiroText(pptId, title);
             preEl.textContent = content;
             this._roteiroText = content;
-            this._roteiroTitle = title;
 
-            // Auto-copy
             await this._copyToClipboard(content);
             if (statusEl) {
                 statusEl.textContent = '✅ Copiado para a área de transferência!';
@@ -2020,6 +2106,32 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
             preEl.textContent = `Erro: ${err.message}`;
             console.error('[Roteiro]', err);
         }
+    }
+
+    /** Salva o roteiro editado no Firebase */
+    async _saveRoteiro() {
+        const svc = window.FirebaseService;
+        if (!svc || !this._roteiroPptId) return;
+
+        const editor = document.getElementById('roteiro-editor');
+        const statusEl = document.getElementById('roteiro-edit-status');
+        const btn = document.getElementById('btn-roteiro-save');
+        if (!editor) return;
+
+        if (btn) { btn.disabled = true; btn.textContent = '💾 Salvando...'; }
+
+        try {
+            await svc.Presentations.update(this._roteiroPptId, { roteiro: editor.value });
+            if (statusEl) {
+                statusEl.textContent = '✅ Roteiro salvo!';
+                setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 4000);
+            }
+        } catch (err) {
+            console.error('[Roteiro]', err);
+            if (statusEl) statusEl.textContent = '⚠️ Erro ao salvar: ' + err.message;
+        }
+
+        if (btn) { btn.disabled = false; btn.textContent = '💾 Salvar'; }
     }
 
     /** Gera o texto completo do roteiro */

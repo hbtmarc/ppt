@@ -42,7 +42,9 @@
                 </button>
             </div>
         </div>
-        <div class="slides-container">
+        <div class="slides-container" style="position:relative;">
+        <!-- Overlay auto-load: esconde slides locais até Firebase carregar -->
+        <div id="autoload-overlay" style="position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:#fff;transition:opacity .35s;font-size:1.1rem;color:#6b7280;">⏳ Carregando apresentação...</div>
 
         <!-- Slide 1: Capa -->
         <section id="slide-1" class="slide active gradient-bg text-center">
@@ -1065,7 +1067,7 @@
 </div>
 
 <!-- =============================================
-     MODAL: ROTEIRO DA APRESENTAÇÃO
+     MODAL: ROTEIRO DA APRESENTAÇÃO (editável + auto)
      ============================================= -->
 <div id="modal-roteiro" class="ppt-modal hidden" role="dialog" aria-modal="true" aria-label="Roteiro da Apresentação">
     <div class="ppt-modal-backdrop"></div>
@@ -1074,12 +1076,40 @@
             <h2>&#128221; Roteiro da Apresentação</h2>
             <button id="modal-roteiro-close" class="ppt-modal-close" aria-label="Fechar">&#x2715;</button>
         </div>
-        <div class="roteiro-toolbar">
-            <span id="roteiro-status" class="roteiro-status"></span>
-            <button id="btn-roteiro-copy" class="ppt-btn ppt-btn--primary ppt-btn--sm">&#128203; Copiar texto</button>
-            <button id="btn-roteiro-download" class="ppt-btn ppt-btn--ghost ppt-btn--sm">&#128190; Baixar .txt</button>
+
+        <!-- Abas -->
+        <div class="roteiro-tabs">
+            <button class="roteiro-tab active" data-tab="edit">&#9998;&#65039; Meu Roteiro</button>
+            <button class="roteiro-tab" data-tab="auto">&#9881;&#65039; Roteiro Automático</button>
         </div>
-        <pre id="roteiro-content" class="roteiro-pre"></pre>
+
+        <!-- Aba: Meu Roteiro (editável) -->
+        <div id="roteiro-tab-edit" class="roteiro-tab-panel active">
+            <div class="roteiro-toolbar">
+                <span id="roteiro-edit-status" class="roteiro-status"></span>
+                <button id="btn-roteiro-save" class="ppt-btn ppt-btn--primary ppt-btn--sm">&#128190; Salvar</button>
+                <button id="btn-roteiro-copy-edit" class="ppt-btn ppt-btn--ghost ppt-btn--sm">&#128203; Copiar</button>
+            </div>
+            <textarea id="roteiro-editor" class="roteiro-textarea" placeholder="Escreva aqui suas falas, bulletpoints, anotações...
+
+Dica: separe por slide usando títulos como:
+
+--- Slide 1: Capa ---
+Bom dia a todos...
+
+--- Slide 2: Contexto ---
+O primeiro ponto..."></textarea>
+        </div>
+
+        <!-- Aba: Roteiro Automático (somente leitura) -->
+        <div id="roteiro-tab-auto" class="roteiro-tab-panel hidden">
+            <div class="roteiro-toolbar">
+                <span id="roteiro-status" class="roteiro-status"></span>
+                <button id="btn-roteiro-copy" class="ppt-btn ppt-btn--primary ppt-btn--sm">&#128203; Copiar texto</button>
+                <button id="btn-roteiro-download" class="ppt-btn ppt-btn--ghost ppt-btn--sm">&#128190; Baixar .txt</button>
+            </div>
+            <pre id="roteiro-content" class="roteiro-pre"></pre>
+        </div>
     </div>
 </div>
 
