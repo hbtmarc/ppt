@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checagem de Campo de Equipamentos | DDSMS</title>
+    <meta name="description" content="DDSMS sobre fadiga ocupacional: reconheça os sinais, compreenda os impactos e saiba como prevenir.">
+    <meta name="author" content="Petrobras | AGF Engenharia">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SVG animation classes now in style.css (.svga-*, .slide-illust, .illust-svg) -->
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">Carregando apresentação...</div>
+    </div>
+    <canvas id="particles-canvas"></canvas>
+    <main id="presentationCard">
+        <div class="presentation-header">
+            <div class="header-left">
+                <div class="brand-pill">DDSMS | Saúde e Segurança</div>
+                <div id="slideIndicator" class="slide-indicator" aria-live="polite">1 / 10</div>
+            </div>
+            <div class="header-right">
+                <button id="presentationsBtn" class="hud-chip" title="Apresentações">
+                    &#128193; <span id="current-ppt-name" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Local</span>
+                </button>
+                <div id="timer" class="hud-chip" aria-label="Timer">00:00</div>
+                <button id="fullscreenBtn" class="hud-chip" aria-label="Tela cheia">
+                    <span id="fs-enter-icon">&#x26F6;</span>
+                    <span id="fs-exit-icon" class="hidden">&#x1F5D7;</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="slides-container">
+
+<!-- ══════════════════════════════════════════
+     SLIDE 1 — CAPA
+     ══════════════════════════════════════════ -->
+<!-- SLIDE_BLOCK_START -->
+<section id="slide-1" class="slide active gradient-bg text-center">
+    <div class="slide-content">
+        <div class="logos-container animated-item">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Logo_petrobras.gif" alt="Petrobras">
+            <img src="https://www.agfengenharia.com.br/wp-content/uploads/2018/09/group-20668-211507.png" alt="AGF Engenharia">
+        </div>
+        <div class="animated-item delay-1 section-kicker mb-4">Inova&ccedil;&atilde;o Operacional &middot; Gest&atilde;o de Equipamentos</div>
+        <h1 class="animated-item delay-2 section-title">
+            <span class="title-line">Lan&ccedil;amento de nova funcionalidade</span>
+            <span class="title-line"><span class="title-accent">Checagem de Campo</span> de Equipamentos</span>
+        </h1>
+        <div class="slide-illust">
+            <svg viewBox="0 0 140 70" class="illust-svg" aria-hidden="true">
+                <rect class="eqa-float" x="48" y="4" width="44" height="58" rx="5" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/>
+                <rect x="51" y="11" width="38" height="32" rx="2" fill="#fff" stroke="#bae6fd" stroke-width=".8"/>
+                <line x1="55" y1="17" x2="85" y2="17" stroke="#9ca3af" stroke-width="1.2" stroke-linecap="round"/>
+                <line x1="58" y1="22" x2="82" y2="22" stroke="#d1d5db" stroke-width="1" stroke-linecap="round"/>
+                <line x1="58" y1="27" x2="74" y2="27" stroke="#d1d5db" stroke-width="1" stroke-linecap="round"/>
+                <circle class="eqa-pulse" cx="79" cy="33" r="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1.2"/>
+                <polyline class="eqa-check" points="76,33 78.5,36 83,30" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="70" cy="55" r="3" fill="#bae6fd" stroke="#0369a1" stroke-width=".8"/>
+                <circle class="svga-blink" cx="108" cy="12" r="2" fill="#4ade80"/>
+                <text x="70" y="68" font-size="6" fill="#6b7280" text-anchor="middle">campo conectado</text>
+            </svg>
+        </div>
+        <p class="animated-item delay-3 mt-4 section-lead">Controle &middot; Rastreabilidade &middot; Consist&ecirc;ncia</p>
+    </div>
+</section>
+
+<section id="slide-2" class="slide subtle-bg">
+    <div class="m-auto w-full max-w-4xl">
+        <div class="animated-item section-kicker mb-2">Contexto</div>
+        <h2 class="animated-item section-title text-gray-800 mb-6">Por que precisamos desta solu&ccedil;&atilde;o?</h2>
+        <div class="grid md:grid-cols-2 gap-5">
+            <div class="animated-item delay-1 card card--warning hover-lift flex gap-3 items-start">
+                <div class="icon-pill icon-pill--yellow flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2">
+                        <path d="M9 12h6M9 16h6M7 4h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="card-title">Registros inconsistentes</div>
+                    <p class="text-sm text-gray-600">Checklists em papel com preenchimento vari&aacute;vel entre equipes</p>
+                </div>
+            </div>
+            <div class="animated-item delay-1 card card--warning hover-lift flex gap-3 items-start">
+                <div class="icon-pill icon-pill--orange flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#c2410c" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="card-title">Aus&ecirc;ncia de evid&ecirc;ncias</div>
+                    <p class="text-sm text-gray-600">Sem registro fotogr&aacute;fico ou anexos validando as checagens realizadas</p>
+                </div>
+            </div>
+            <div class="animated-item delay-2 card card--warning hover-lift flex gap-3 items-start">
+                <div class="icon-pill icon-pill--purple flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2"/>
+                        <path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="card-title">Dif&iacute;cil acompanhamento</div>
+                    <p class="text-sm text-gray-600">Sem visibilidade em tempo real do status das checagens por equipe</p>
+                </div>
+            </div>
+            <div class="animated-item delay-2 card card--warning hover-lift flex gap-3 items-start">
+                <div class="icon-pill icon-pill--blue flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2">
+                        <path d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="card-title">Rastreabilidade limitada</div>
+                    <p class="text-sm text-gray-600">Dificuldade de auditoria e consulta hist&oacute;rica dos registros de campo</p>
+                </div>
+            </div>
+        </div>
+        <div class="animated-item delay-3 mt-5 card card--soft text-center">
+            <p class="text-base font-semibold text-gray-700">A solu&ccedil;&atilde;o de Checagem de Campo resolve cada um desses pontos de forma integrada.</p>
+        </div>
+    </div>
+</section>
+
+<section id="slide-3" class="slide subtle-bg text-center">
+    <div class="m-auto w-full max-w-4xl">
+        <div class="animated-item section-kicker mb-2">Objetivo</div>
+        <h2 class="animated-item section-title text-gray-800 mb-8">Os tr&ecirc;s pilares da solu&ccedil;&atilde;o</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="animated-item eqa-fadeup delay-1 card hover-lift" style="border-top:3px solid #008542;text-align:center;">
+                <div style="width:54px;height:54px;background:#dcfce7;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#16a34a" stroke-width="2">
+                        <path d="M9 12l2 2 4-4M7 4h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-black text-emerald-700 mb-1">Padronizar</div>
+                <p class="text-sm text-gray-600">Formul&aacute;rios &uacute;nicos aplicados a todas as equipes de campo</p>
+            </div>
+            <div class="animated-item eqa-fadeup2 delay-2 card hover-lift" style="border-top:3px solid #0369a1;text-align:center;">
+                <div style="width:54px;height:54px;background:#e0f2fe;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0369a1" stroke-width="2">
+                        <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7zM14 2v5h5M12 12v4M10 14h4"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-black text-blue-700 mb-1">Registrar</div>
+                <p class="text-sm text-gray-600">Dados, fotos e evid&ecirc;ncias centralizados e audit&aacute;veis</p>
+            </div>
+            <div class="animated-item eqa-fadeup3 delay-3 card hover-lift" style="border-top:3px solid #7c3aed;text-align:center;">
+                <div style="width:54px;height:54px;background:#ede9fe;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#7c3aed" stroke-width="2">
+                        <path d="M3 3v18h18M7 16l4-4 4 4 4-5"/>
+                    </svg>
+                </div>
+                <div class="text-2xl font-black text-purple-700 mb-1">Acompanhar</div>
+                <p class="text-sm text-gray-600">Monitoramento em tempo real do progresso e status das inspe&ccedil;&otilde;es</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="slide-4" class="slide subtle-bg">
+    <div class="m-auto w-full max-w-5xl">
+        <div class="animated-item section-kicker mb-2">Benef&iacute;cios</div>
+        <h2 class="animated-item section-title text-gray-800 mb-6">O que a solu&ccedil;&atilde;o entrega</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div class="animated-item eqa-fadeup delay-1 card card--success hover-lift text-center">
+                <div class="icon-pill icon-pill--emerald mx-auto mb-2">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                </div>
+                <div class="card-title">Agilidade</div>
+                <p class="text-xs text-gray-600">Preenchimento r&aacute;pido e intuitivo diretamente no PDA em campo</p>
+            </div>
+            <div class="animated-item eqa-fadeup2 delay-1 card card--success hover-lift text-center">
+                <div class="icon-pill icon-pill--blue mx-auto mb-2">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                </div>
+                <div class="card-title">Rastreabilidade</div>
+                <p class="text-xs text-gray-600">Hist&oacute;rico completo e consulta&aacute;vel de cada checagem realizada</p>
+            </div>
+            <div class="animated-item eqa-fadeup3 delay-2 card card--success hover-lift text-center">
+                <div class="icon-pill icon-pill--teal mx-auto mb-2">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                </div>
+                <div class="card-title">Confiabilidade</div>
+                <p class="text-xs text-gray-600">Dados validados e &iacute;ntegros, sem margem para registros informais</p>
+            </div>
+            <div class="animated-item eqa-fadeup4 delay-2 card card--success hover-lift text-center">
+                <div class="icon-pill icon-pill--purple mx-auto mb-2">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </div>
+                <div class="card-title">Centraliza&ccedil;&atilde;o</div>
+                <p class="text-xs text-gray-600">Todos os dados em uma plataforma &uacute;nica, acess&iacute;vel a qualquer momento</p>
+            </div>
+            <div class="animated-item eqa-fadeup5 delay-3 card card--success hover-lift text-center">
+                <div class="icon-pill icon-pill--yellow mx-auto mb-2">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <div class="card-title">Apoio &agrave; auditoria</div>
+                <p class="text-xs text-gray-600">Evid&ecirc;ncias fotogr&aacute;ficas e registros prontos para qualquer auditoria</p>
+            </div>
+            <div class="animated-item eqa-fadeup6 delay-3 card card--success hover-lift text-center">
+                <div class="icon-pill icon-pill--orange mx-auto mb-2">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#c2410c" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 4-8"/></svg>
+                </div>
+                <div class="card-title">Acompanhamento</div>
+                <p class="text-xs text-gray-600">Visibilidade operacional em tempo real sobre o status das equipes</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="slide-5" class="slide subtle-bg">
+    <div class="m-auto w-full max-w-4xl">
+        <div class="animated-item section-kicker mb-2">Capacidades</div>
+        <h2 class="animated-item section-title text-gray-800 mb-7">O que a solu&ccedil;&atilde;o oferece</h2>
+        <div class="space-y-3">
+            <div class="animated-item eqa-slide-r delay-1 card card--soft flex items-center gap-4 p-4">
+                <div class="icon-pill icon-pill--blue flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01M9 7h6M9 11h4"/></svg>
+                </div>
+                <div><div class="card-title">Checagem via PDA</div><p class="text-sm text-gray-600">Formul&aacute;rios digitais acessados diretamente no dispositivo de campo, sem papel</p></div>
+                <div class="ml-auto"><span class="eqa-glow" style="display:inline-block;padding:.25rem .75rem;background:#dcfce7;color:#065f46;border-radius:999px;font-size:.7rem;font-weight:700;">DIGITAL</span></div>
+            </div>
+            <div class="animated-item eqa-slide-r2 delay-2 card card--soft flex items-center gap-4 p-4">
+                <div class="icon-pill icon-pill--emerald flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+                </div>
+                <div><div class="card-title">Preenchimento em campo</div><p class="text-sm text-gray-600">Checklists estruturados e padronizados para cada tipo de equipamento</p></div>
+                <div class="ml-auto"><span style="display:inline-block;padding:.25rem .75rem;background:#e0f2fe;color:#0369a1;border-radius:999px;font-size:.7rem;font-weight:700;">PADRAO</span></div>
+            </div>
+            <div class="animated-item eqa-slide-r3 delay-2 card card--soft flex items-center gap-4 p-4">
+                <div class="icon-pill icon-pill--yellow flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+                <div><div class="card-title">Registro fotogr&aacute;fico</div><p class="text-sm text-gray-600">Captura de fotos como evid&ecirc;ncia direta no momento da inspe&ccedil;&atilde;o</p></div>
+                <div class="ml-auto"><span style="display:inline-block;padding:.25rem .75rem;background:#fef3c7;color:#92400e;border-radius:999px;font-size:.7rem;font-weight:700;">EVIDENCIA</span></div>
+            </div>
+            <div class="animated-item eqa-slide-r4 delay-3 card card--soft flex items-center gap-4 p-4">
+                <div class="icon-pill icon-pill--purple flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M12 12v4M10 14h4"/></svg>
+                </div>
+                <div><div class="card-title">Anexos e documentos</div><p class="text-sm text-gray-600">Possibilidade de vincular arquivos, laudos e documentos ao registro</p></div>
+                <div class="ml-auto"><span style="display:inline-block;padding:.25rem .75rem;background:#ede9fe;color:#6d28d9;border-radius:999px;font-size:.7rem;font-weight:700;">ANEXO</span></div>
+            </div>
+            <div class="animated-item eqa-slide-r5 delay-3 card card--soft flex items-center gap-4 p-4">
+                <div class="icon-pill icon-pill--teal flex-shrink-0">
+                    <svg class="icon-img sm" viewBox="0 0 24 24" fill="none" stroke="#0f766e" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg>
+                </div>
+                <div><div class="card-title">Consulta posterior</div><p class="text-sm text-gray-600">Acesso ao hist&oacute;rico completo de checagens a qualquer momento, por qualquer respons&aacute;vel</p></div>
+                <div class="ml-auto"><span style="display:inline-block;padding:.25rem .75rem;background:#ccfbf1;color:#0f766e;border-radius:999px;font-size:.7rem;font-weight:700;">HISTORICO</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="slide-6" class="slide text-center">
+    <div class="m-auto w-full max-w-5xl">
+        <div class="animated-item section-kicker mb-2">Como funciona</div>
+        <h2 class="animated-item section-title text-gray-800 mb-6">Fluxo operacional da checagem</h2>
+        <div class="animated-item delay-1 grid grid-cols-6 gap-2 items-start" style="position:relative;">
+            <div style="position:absolute;top:26px;left:10%;width:80%;height:2px;background:linear-gradient(90deg,#008542,#00A552,#0369a1,#7c3aed,#0f766e,#065f46);border-radius:2px;z-index:0;"></div>
+            <div class="eqa-fadeup delay-1 flex flex-col items-center" style="z-index:1;">
+                <div style="width:52px;height:52px;background:#dcfce7;border:2px solid #008542;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.5rem;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#008542" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+                </div>
+                <div class="text-xs font-bold text-gray-700">Acessar</div>
+                <div class="text-xs text-gray-500 mt-1">PDA / sistema</div>
+            </div>
+            <div class="eqa-fadeup2 delay-1 flex flex-col items-center" style="z-index:1;">
+                <div style="width:52px;height:52px;background:#e0f2fe;border:2px solid #0369a1;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.5rem;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0369a1" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h8"/></svg>
+                </div>
+                <div class="text-xs font-bold text-gray-700">Selecionar</div>
+                <div class="text-xs text-gray-500 mt-1">equipamento</div>
+            </div>
+            <div class="eqa-fadeup3 delay-2 flex flex-col items-center" style="z-index:1;">
+                <div style="width:52px;height:52px;background:#fef3c7;border:2px solid #f59e0b;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.5rem;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#d97706" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </div>
+                <div class="text-xs font-bold text-gray-700">Preencher</div>
+                <div class="text-xs text-gray-500 mt-1">checklist</div>
+            </div>
+            <div class="eqa-fadeup4 delay-2 flex flex-col items-center" style="z-index:1;">
+                <div style="width:52px;height:52px;background:#fce7f3;border:2px solid #be185d;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.5rem;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#be185d" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+                <div class="text-xs font-bold text-gray-700">Registrar</div>
+                <div class="text-xs text-gray-500 mt-1">evid&ecirc;ncias</div>
+            </div>
+            <div class="eqa-fadeup5 delay-3 flex flex-col items-center" style="z-index:1;">
+                <div style="width:52px;height:52px;background:#ede9fe;border:2px solid #7c3aed;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.5rem;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M9 12l2 2 4-4M7 4h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
+                </div>
+                <div class="text-xs font-bold text-gray-700">Concluir</div>
+                <div class="text-xs text-gray-500 mt-1">e enviar</div>
+            </div>
+            <div class="eqa-fadeup6 delay-3 flex flex-col items-center" style="z-index:1;">
+                <div style="width:52px;height:52px;background:#ccfbf1;border:2px solid #0f766e;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.5rem;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0f766e" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg>
+                </div>
+                <div class="text-xs font-bold text-gray-700">Consultar</div>
+                <div class="text-xs text-gray-500 mt-1">hist&oacute;rico</div>
+            </div>
+        </div>
+        <div class="animated-item delay-2 mt-8 card card--soft text-center">
+            <p class="text-base font-semibold text-gray-700">Processo simples, guiado e rastreável — do campo ao sistema em poucos passos.</p>
+        </div>
+    </div>
+</section>
+
+<section id="slide-7" class="slide gradient-bg text-center">
+    <div class="m-auto w-full max-w-3xl flex flex-col items-center">
+        <div class="animated-item section-kicker mb-3">Ao vivo</div>
+        <h2 class="animated-item section-title mb-6">Demonstra&ccedil;&atilde;o pr&aacute;tica</h2>
+        <div class="animated-item delay-1" style="width:200px;height:130px;margin:0 auto;">
+            <svg viewBox="0 0 200 130" style="width:100%;height:100%;" aria-hidden="true">
+                <rect class="eqa-float" x="30" y="5" width="140" height="95" rx="8" fill="#1e3a5f" stroke="#60a5fa" stroke-width="1.5"/>
+                <rect x="36" y="12" width="128" height="72" rx="3" fill="#0c1f35"/>
+                <rect x="40" y="16" width="120" height="8" rx="2" fill="#1d4ed8" opacity=".7"/>
+                <text x="100" y="22" text-anchor="middle" font-size="4.5" fill="#93c5fd" font-weight="700">CHECAGEM DE EQUIPAMENTO #2847</text>
+                <rect x="40" y="27" width="50" height="6" rx="1.5" fill="#374151"/>
+                <text x="65" y="32" text-anchor="middle" font-size="4" fill="#9ca3af">Bomba Centrifuga B-04</text>
+                <rect x="40" y="36" width="8" height="5" rx="1" fill="#16a34a"/>
+                <text x="44" y="40.5" text-anchor="middle" font-size="4" fill="white" font-weight="700">ok</text>
+                <text x="53" y="40.5" font-size="3.8" fill="#d1fae5">Verificacao visual</text>
+                <rect x="40" y="43" width="8" height="5" rx="1" fill="#16a34a"/>
+                <text x="44" y="47.5" text-anchor="middle" font-size="4" fill="white" font-weight="700">ok</text>
+                <text x="53" y="47.5" font-size="3.8" fill="#d1fae5">Nivel de oleo</text>
+                <rect x="40" y="50" width="8" height="5" rx="1" fill="#374151" stroke="#60a5fa" stroke-width=".5"/>
+                <text x="53" y="54.5" font-size="3.8" fill="#9ca3af">Temperatura de operacao</text>
+                <rect class="eqa-pulse" x="130" y="56" width="24" height="18" rx="4" fill="#1d4ed8" opacity=".8"/>
+                <text x="142" y="68" text-anchor="middle" font-size="8">+foto</text>
+                <rect x="40" y="75" width="120" height="4" rx="2" fill="#1f2937"/>
+                <rect x="40" y="75" width="80" height="4" rx="2" fill="#16a34a"/>
+                <text x="100" y="83" text-anchor="middle" font-size="4" fill="#6b7280">Progresso: 67%</text>
+                <circle cx="100" cy="107" r="5" fill="#1e3a5f" stroke="#60a5fa" stroke-width="1.2"/>
+            </svg>
+        </div>
+        <div class="animated-item delay-2 mt-5 bg-white/25 p-5 rounded-2xl backdrop-blur-sm max-w-xl text-center">
+            <p class="text-lg font-semibold text-white mb-1">Veja como a opera&ccedil;&atilde;o acontece na pr&aacute;tica</p>
+            <p class="text-sm text-white/80">Fluxo completo de checagem, registro fotogr&aacute;fico e conclus&atilde;o</p>
+        </div>
+    </div>
+</section>
+
+<section id="slide-8" class="slide subtle-bg">
+    <div class="m-auto w-full max-w-4xl">
+        <div class="animated-item section-kicker mb-2">Orienta&ccedil;&otilde;es</div>
+        <h2 class="animated-item section-title text-gray-800 mb-7">Boas pr&aacute;ticas de uso</h2>
+        <div class="grid md:grid-cols-2 gap-5">
+            <div class="animated-item delay-1 card card--success hover-lift flex gap-4 items-start p-5">
+                <div style="width:44px;height:44px;background:#dcfce7;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#16a34a" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+                </div>
+                <div>
+                    <div class="card-title">Preenchimento correto</div>
+                    <p class="text-sm text-gray-600">Responda todos os itens com aten&ccedil;&atilde;o. Campos em branco invalidam o registro e comprometem o hist&oacute;rico.</p>
+                </div>
+            </div>
+            <div class="animated-item delay-1 card card--success hover-lift flex gap-4 items-start p-5">
+                <div style="width:44px;height:44px;background:#fef3c7;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#d97706" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                </div>
+                <div>
+                    <div class="card-title">Qualidade das evid&ecirc;ncias</div>
+                    <p class="text-sm text-gray-600">Fotos n&iacute;tidas, com boa ilumina&ccedil;&atilde;o e enquadramento que identifique claramente o equipamento.</p>
+                </div>
+            </div>
+            <div class="animated-item delay-2 card card--success hover-lift flex gap-4 items-start p-5">
+                <div style="width:44px;height:44px;background:#e0f2fe;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0369a1" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01"/></svg>
+                </div>
+                <div>
+                    <div class="card-title">Padroniza&ccedil;&atilde;o</div>
+                    <p class="text-sm text-gray-600">Utilize sempre o formul&aacute;rio correto para cada tipo de equipamento. N&atilde;o improvise ou adapte.</p>
+                </div>
+            </div>
+            <div class="animated-item delay-2 card card--success hover-lift flex gap-4 items-start p-5">
+                <div style="width:44px;height:44px;background:#ede9fe;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7zM14 2v5h5M12 12v4M10 14h4"/></svg>
+                </div>
+                <div>
+                    <div class="card-title">Registro completo</div>
+                    <p class="text-sm text-gray-600">Sempre conclua e envie o registro ao final da inspe&ccedil;&atilde;o. Checklists incompletos n&atilde;o geram rastreabilidade.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="slide-9" class="slide subtle-bg">
+    <div class="m-auto w-full max-w-5xl">
+        <div class="animated-item section-kicker mb-2">Roadmap</div>
+        <h2 class="animated-item section-title text-gray-800 mb-8">Pr&oacute;ximos passos</h2>
+        <div class="animated-item delay-1" style="position:relative;padding-bottom:1rem;">
+            <div style="position:absolute;top:28px;left:0;right:0;height:3px;background:linear-gradient(90deg,#008542 0%,#00A552 40%,#d1d5db 60%,#d1d5db 100%);border-radius:2px;"></div>
+            <div class="grid grid-cols-5 gap-3">
+                <div class="eqa-fadeup delay-1 flex flex-col items-center">
+                    <div style="width:56px;height:56px;background:#008542;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;box-shadow:0 4px 12px rgba(0,133,66,.3);">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2.2"><path d="M9 12l2 2 4-4M7 4h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg>
+                    </div>
+                    <div class="text-xs font-bold text-emerald-800 text-center">In&iacute;cio da utiliza&ccedil;&atilde;o</div>
+                    <div style="margin-top:.4rem;padding:.2rem .6rem;background:#dcfce7;color:#065f46;border-radius:999px;font-size:.65rem;font-weight:700;">AGORA</div>
+                </div>
+                <div class="eqa-fadeup2 delay-1 flex flex-col items-center">
+                    <div style="width:56px;height:56px;background:#00A552;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;box-shadow:0 4px 12px rgba(0,165,82,.3);">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2.2"><path d="M3 3v18h18M7 14l4-4 4 4 4-8"/></svg>
+                    </div>
+                    <div class="text-xs font-bold text-emerald-800 text-center">Acompanhamento inicial</div>
+                    <div style="margin-top:.4rem;padding:.2rem .6rem;background:#dcfce7;color:#065f46;border-radius:999px;font-size:.65rem;font-weight:700;">SEM. 1-2</div>
+                </div>
+                <div class="eqa-fadeup3 delay-2 flex flex-col items-center">
+                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#6b7280" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div class="text-xs font-bold text-gray-600 text-center">Canal para d&uacute;vidas</div>
+                    <div style="margin-top:.4rem;padding:.2rem .6rem;background:#f3f4f6;color:#6b7280;border-radius:999px;font-size:.65rem;font-weight:700;">CONTINUO</div>
+                </div>
+                <div class="eqa-fadeup4 delay-2 flex flex-col items-center">
+                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#6b7280" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </div>
+                    <div class="text-xs font-bold text-gray-600 text-center">Coleta de melhorias</div>
+                    <div style="margin-top:.4rem;padding:.2rem .6rem;background:#f3f4f6;color:#6b7280;border-radius:999px;font-size:.65rem;font-weight:700;">MES 1</div>
+                </div>
+                <div class="eqa-fadeup5 delay-3 flex flex-col items-center">
+                    <div style="width:56px;height:56px;background:#e5e7eb;border:2px solid #d1d5db;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:.75rem;">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#6b7280" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <div class="text-xs font-bold text-gray-600 text-center">Apoio &agrave; ado&ccedil;&atilde;o plena</div>
+                    <div style="margin-top:.4rem;padding:.2rem .6rem;background:#f3f4f6;color:#6b7280;border-radius:999px;font-size:.65rem;font-weight:700;">MES 1-2</div>
+                </div>
+            </div>
+        </div>
+        <div class="animated-item delay-3 mt-6 card card--soft text-center">
+            <p class="text-base font-semibold text-gray-700">Contamos com o engajamento de todos para uma ado&ccedil;&atilde;o bem-sucedida desde o primeiro dia.</p>
+        </div>
+    </div>
+</section>
+
+<section id="slide-10" class="slide low-opacity-gradient-bg text-center">
+    <div class="m-auto flex flex-col items-center text-gray-800 w-full max-w-3xl">
+        <div class="slide-illust" style="width:160px;height:80px;margin-bottom:.5rem;">
+            <svg viewBox="0 0 160 80" style="width:100%;height:100%;" aria-hidden="true">
+                <circle class="eqa-pulse" cx="80" cy="40" r="14" fill="#dcfce7" stroke="#008542" stroke-width="2"/>
+                <text x="80" y="44" text-anchor="middle" font-size="7" fill="#065f46" font-weight="700">OK</text>
+                <circle class="svga-blink" cx="28" cy="18" r="8" fill="#e0f2fe" stroke="#0369a1" stroke-width="1.5"/>
+                <circle class="svga-blink" cx="132" cy="18" r="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" style="animation-delay:.5s"/>
+                <circle class="svga-blink" cx="20" cy="58" r="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5" style="animation-delay:1s"/>
+                <circle class="svga-blink" cx="140" cy="58" r="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="1.5" style="animation-delay:1.5s"/>
+                <line x1="68" y1="32" x2="35" y2="23" stroke="#008542" stroke-width="1" stroke-dasharray="3 2" opacity=".6"/>
+                <line x1="92" y1="32" x2="125" y2="23" stroke="#008542" stroke-width="1" stroke-dasharray="3 2" opacity=".6"/>
+                <line x1="68" y1="50" x2="27" y2="55" stroke="#008542" stroke-width="1" stroke-dasharray="3 2" opacity=".6"/>
+                <line x1="92" y1="50" x2="133" y2="55" stroke="#008542" stroke-width="1" stroke-dasharray="3 2" opacity=".6"/>
+            </svg>
+        </div>
+        <div class="animated-item mb-5 flex items-center justify-center space-x-8">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Logo_petrobras.gif" alt="Petrobras" class="h-14">
+            <img src="https://www.agfengenharia.com.br/wp-content/uploads/2018/09/group-20668-211507.png" alt="AGF Engenharia" class="h-14">
+        </div>
+        <h1 class="animated-item delay-1 text-3xl md:text-5xl font-black leading-tight text-gray-800">Mais controle. Mais consist&ecirc;ncia.</h1>
+        <h2 class="animated-item delay-2 text-3xl md:text-4xl font-black text-emerald-700 mt-1">Mais confiabilidade.</h2>
+        <div class="animated-item delay-2 mt-6 bg-white/55 p-7 rounded-2xl backdrop-blur-sm max-w-2xl mx-auto text-center">
+            <p class="font-semibold text-gray-700 text-lg mb-3">A Checagem de Campo &eacute; mais um passo na evolu&ccedil;&atilde;o dos nossos processos.<br>Cada registro feito com qualidade fortalece toda a opera&ccedil;&atilde;o.</p>
+            <p class="text-sm text-gray-500 mb-4">Inova&ccedil;&atilde;o a servi&ccedil;o da seguran&ccedil;a e da efici&ecirc;ncia operacional.</p>
+            <p class="text-3xl font-black text-gray-800">D&uacute;vidas?</p>
+        </div>
+    </div>
+</section>
+
+        </div><!-- /slides-container -->
+
+        <nav class="navigation-bar glass">
+            <button id="prevBtn" class="nav-button" aria-label="Slide anterior">Anterior</button>
+            <div class="progress-container">
+                <div class="progress-track">
+                    <div id="progressBar" class="progress-fill" style="width:0%"></div>
+                </div>
+            </div>
+            <button id="nextBtn" class="nav-button primary" aria-label="Próximo slide">Próximo</button>
+        </nav>
+    </main>
+
+    <!-- Modais Firebase (reutilizados do sistema principal) -->
+    <div id="modal-presentations" class="ppt-modal hidden" role="dialog" aria-modal="true">
+        <div class="ppt-modal-backdrop"></div>
+        <div class="ppt-modal-box">
+            <div class="ppt-modal-header">
+                <h2>&#128193; Apresentações</h2>
+                <button id="modal-ppt-close" class="ppt-modal-close">&#x2715;</button>
+            </div>
+            <div id="admin-login-panel" class="ppt-section hidden">
+                <p class="ppt-section-title">&#128274; Acesso Admin</p>
+                <div class="ppt-form-row"><input type="email" id="admin-email" placeholder="E-mail" class="ppt-input"></div>
+                <div class="ppt-form-row"><input type="password" id="admin-password" placeholder="Senha" class="ppt-input"></div>
+                <div id="admin-login-error" class="ppt-error hidden"></div>
+                <div class="ppt-form-actions">
+                    <button id="btn-admin-login" class="ppt-btn ppt-btn--primary">Entrar</button>
+                    <button id="btn-cancel-login" class="ppt-btn ppt-btn--ghost">Cancelar</button>
+                </div>
+            </div>
+            <div class="ppt-actions-bar">
+                <button id="btn-new-ppt" class="ppt-btn ppt-btn--success admin-only hidden">+ Nova</button>
+                <button id="btn-save-current-ppt" class="ppt-btn ppt-btn--warning admin-only hidden" title="Salvar atual">&#128190; Salvar atual</button>
+                <span class="ppt-spacer"></span>
+                <span id="admin-user-label" class="ppt-user-label hidden"></span>
+                <button id="btn-admin-access" class="ppt-btn ppt-btn--ghost">&#128274; Admin</button>
+                <button id="btn-admin-logout" class="ppt-btn ppt-btn--ghost admin-only hidden">Sair</button>
+            </div>
+            <div id="ppt-list" class="ppt-list"><div class="ppt-loading">&#x23F3; Carregando...</div></div>
+        </div>
+    </div>
+
+    <div id="modal-edit-ppt" class="ppt-modal hidden" role="dialog" aria-modal="true">
+        <div class="ppt-modal-backdrop"></div>
+        <div class="ppt-modal-box ppt-modal-box--wide">
+            <div class="ppt-modal-header">
+                <h2 id="edit-ppt-title-label">Nova Apresentação</h2>
+                <button id="modal-edit-close" class="ppt-modal-close">&#x2715;</button>
+            </div>
+            <div class="ppt-edit-layout">
+                <div class="ppt-meta-panel">
+                    <p class="ppt-section-title">Informações</p>
+                    <div class="ppt-form-row"><label class="ppt-label">Título *</label><input type="text" id="edit-ppt-title" class="ppt-input" placeholder="Título"></div>
+                    <div class="ppt-form-row"><label class="ppt-label">Descrição</label><textarea id="edit-ppt-desc" class="ppt-input ppt-textarea" rows="2"></textarea></div>
+                    <div class="ppt-form-row"><label class="ppt-label">Autor</label><input type="text" id="edit-ppt-author" class="ppt-input"></div>
+                    <input type="hidden" id="edit-ppt-id">
+                    <div id="edit-ppt-error" class="ppt-error hidden"></div>
+                    <div class="ppt-form-actions"><button id="btn-save-ppt-meta" class="ppt-btn ppt-btn--primary">Salvar Informações</button></div>
+                </div>
+                <div class="ppt-slides-panel">
+                    <div class="ppt-slides-header">
+                        <p class="ppt-section-title">Slides</p>
+                        <button id="btn-add-slide" class="ppt-btn ppt-btn--success">+ Slide</button>
+                    </div>
+                    <div id="slide-list-editor" class="ppt-slide-list"><div class="ppt-loading">Salve primeiro para adicionar slides.</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-slide" class="ppt-modal hidden" role="dialog" aria-modal="true">
+        <div class="ppt-modal-backdrop"></div>
+        <div class="ppt-modal-box ppt-modal-box--editor">
+            <div class="ppt-modal-header" style="flex-shrink:0;">
+                <h2 id="edit-slide-label">Novo Slide</h2>
+                <button id="modal-slide-close" class="ppt-modal-close">&#x2715;</button>
+            </div>
+            <div class="slide-fields-row">
+                <div class="ppt-form-row" style="flex:1;min-width:180px;"><label class="ppt-label">Título do Slide</label><input type="text" id="edit-slide-title" class="ppt-input"></div>
+                <div class="ppt-form-row" style="min-width:220px;"><label class="ppt-label">Fundo / Layout</label>
+                    <select id="edit-slide-classes" class="ppt-input">
+                        <option value="">Padrão (branco)</option>
+                        <option value="gradient-bg text-center">🟢 Gradiente verde (capa)</option>
+                        <option value="subtle-bg text-center">⬜ Cinza suave + centralizado</option>
+                        <option value="subtle-bg">⬜ Cinza suave</option>
+                        <option value="text-center">Branco + centralizado</option>
+                        <option value="low-opacity-gradient-bg">✨ Gradiente suave (fechamento)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="slide-editor-split">
+                <div class="slide-editor-left">
+                    <div class="slide-editor-bar">
+                        <span class="slide-editor-bar-title">&#9000;&#65039; HTML</span>
+                        <div class="toolbar-snips">
+                            <button class="toolbar-btn" data-snip="kicker">Kicker</button>
+                            <button class="toolbar-btn" data-snip="title">H2</button>
+                            <button class="toolbar-btn" data-snip="lead">Lead</button>
+                            <div class="toolbar-sep"></div>
+                            <button class="toolbar-btn" data-snip="card-success">✅ Card</button>
+                            <button class="toolbar-btn" data-snip="card-danger">⚠️ Card</button>
+                            <button class="toolbar-btn" data-snip="list">Lista</button>
+                            <div class="toolbar-sep"></div>
+                            <button class="toolbar-btn toolbar-btn--format" id="btn-format-html">&#10024; Formatar</button>
+                            <button class="toolbar-btn toolbar-btn--accent" id="btn-slide-template">&#127912; Templates</button>
+                        </div>
+                    </div>
+                    <textarea id="edit-slide-content" class="ppt-input ppt-code-editor ppt-code-editor--split" spellcheck="false"></textarea>
+                </div>
+                <div class="slide-editor-right">
+                    <div class="slide-editor-bar">
+                        <span class="slide-editor-bar-title">&#128065;&#65039; Preview</span>
+                        <span class="preview-dot" id="preview-status">&#9679;</span>
+                    </div>
+                    <div class="slide-preview-wrap">
+                        <iframe id="slide-preview-frame" sandbox="allow-scripts" title="Preview"></iframe>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="edit-slide-id">
+            <input type="hidden" id="edit-slide-ppt-id">
+            <div id="edit-slide-error" class="ppt-error hidden"></div>
+            <div class="ppt-form-actions" style="flex-shrink:0;">
+                <button id="btn-save-slide" class="ppt-btn ppt-btn--primary">Salvar Slide</button>
+                <button id="btn-cancel-slide" class="ppt-btn ppt-btn--ghost">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-templates" class="ppt-modal hidden" role="dialog" aria-modal="true">
+        <div class="ppt-modal-backdrop"></div>
+        <div class="ppt-modal-box" style="max-width:860px;">
+            <div class="ppt-modal-header">
+                <h2>&#127912; Galeria de Templates</h2>
+                <button id="modal-tpl-close" class="ppt-modal-close">&#x2715;</button>
+            </div>
+            <p style="font-size:.8rem;color:#6b7280;">Clique num template para inserir no editor.</p>
+            <div id="template-gallery" class="tpl-gallery"></div>
+        </div>
+    </div>
+
+    <div id="modal-save-current" class="ppt-modal hidden" role="dialog" aria-modal="true">
+        <div class="ppt-modal-backdrop"></div>
+        <div class="ppt-modal-box" style="max-width:440px;">
+            <div class="ppt-modal-header">
+                <h2>&#128190; Salvar Apresentação Atual</h2>
+                <button id="modal-save-current-close" class="ppt-modal-close">&#x2715;</button>
+            </div>
+            <p style="font-size:.85rem;color:#374151;">Os <strong id="save-current-count">0</strong> slides abertos serão salvos no banco.</p>
+            <div class="ppt-form-row" style="margin-top:.75rem;"><label class="ppt-label">Título *</label><input type="text" id="save-current-title" class="ppt-input" placeholder="Título da apresentação"></div>
+            <div class="ppt-form-row"><label class="ppt-label">Descrição</label><input type="text" id="save-current-desc" class="ppt-input"></div>
+            <div class="ppt-form-row"><label class="ppt-label">Autor</label><input type="text" id="save-current-author" class="ppt-input"></div>
+            <div id="save-current-error" class="ppt-error hidden"></div>
+            <div class="ppt-form-actions">
+                <button id="btn-confirm-save-current" class="ppt-btn ppt-btn--primary">&#128190; Salvar no banco</button>
+                <button id="btn-cancel-save-current" class="ppt-btn ppt-btn--ghost">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-export-progress" class="ppt-modal hidden" role="dialog" aria-modal="true" aria-live="polite">
+        <div class="ppt-modal-backdrop"></div>
+        <div class="ppt-modal-box" style="max-width:340px;text-align:center;gap:1.25rem;padding:2rem 1.75rem;">
+            <h2 id="export-progress-title" style="font-size:1.15rem;font-weight:700;color:#111827;margin:0;">Gerando arquivo…</h2>
+            <div class="export-spinner"></div>
+            <p id="export-progress-msg" style="font-size:.875rem;color:#6b7280;margin:0;">Preparando slides…</p>
+            <div class="export-progress-track"><div id="export-progress-bar" class="export-progress-fill" style="width:0%"></div></div>
+        </div>
+    </div>
+
+    <script type="module" src="firebase.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

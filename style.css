@@ -2096,4 +2096,37 @@ button, .nav-button { cursor: pointer; }
 
 /* .slide-illust e .illust-svg já definidos na seção SLIDE ILLUSTRATIONS acima */
 
+/* ============================================
+   ANIMAÇÕES EQA — CHECAGEM DE CAMPO
+   (equipment / technology theme)
+   ============================================ */
+@keyframes eqaFloat      { 0%,100%{transform:translateY(0)}    50%{transform:translateY(-6px)} }
+@keyframes eqaPulse      { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.07);opacity:.8} }
+@keyframes eqaGlow       { 0%,100%{opacity:.55} 50%{opacity:1} }
+@keyframes eqaSlideRight { from{transform:translateX(-18px);opacity:0} to{transform:translateX(0);opacity:1} }
+@keyframes eqaCheck      { from{stroke-dashoffset:60} to{stroke-dashoffset:0} }
+@keyframes eqaSpin       { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes eqaProgress   { from{width:0} to{width:100%} }
+@keyframes eqaFadeUp     { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes eqaBlipMove   { 0%{offset-distance:0%} 100%{offset-distance:100%} }
+
+.eqa-float     { animation: eqaFloat      3.2s ease-in-out infinite; }
+.eqa-pulse     { animation: eqaPulse      2.2s ease-in-out infinite; transform-origin:50% 50%; }
+.eqa-glow      { animation: eqaGlow       2.5s ease-in-out infinite; }
+.eqa-check     { stroke-dasharray:60; stroke-dashoffset:60;
+                 animation: eqaCheck      1s   .4s ease-out forwards; }
+.eqa-spin      { animation: eqaSpin       10s  linear   infinite; transform-origin:50% 50%; }
+.eqa-slide-r   { animation: eqaSlideRight .7s  ease-out forwards; }
+.eqa-slide-r2  { animation: eqaSlideRight .7s  .2s ease-out forwards; opacity:0; }
+.eqa-slide-r3  { animation: eqaSlideRight .7s  .4s ease-out forwards; opacity:0; }
+.eqa-slide-r4  { animation: eqaSlideRight .7s  .6s ease-out forwards; opacity:0; }
+.eqa-slide-r5  { animation: eqaSlideRight .7s  .8s ease-out forwards; opacity:0; }
+.eqa-slide-r6  { animation: eqaSlideRight .7s 1.0s ease-out forwards; opacity:0; }
+.eqa-fadeup    { animation: eqaFadeUp     .8s  ease-out forwards; }
+.eqa-fadeup2   { animation: eqaFadeUp     .8s  .2s ease-out forwards; opacity:0; }
+.eqa-fadeup3   { animation: eqaFadeUp     .8s  .4s ease-out forwards; opacity:0; }
+.eqa-fadeup4   { animation: eqaFadeUp     .8s  .6s ease-out forwards; opacity:0; }
+.eqa-fadeup5   { animation: eqaFadeUp     .8s  .8s ease-out forwards; opacity:0; }
+.eqa-fadeup6   { animation: eqaFadeUp     .8s 1.0s ease-out forwards; opacity:0; }
+
 

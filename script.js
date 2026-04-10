@@ -630,7 +630,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const initFirebaseUI = () => {
         if (window._fbUIInitialized) return; // evita dupla inicialização
         window._fbUIInitialized = true;
-        new FirebaseUI(slideManager);
+        try {
+            new FirebaseUI(slideManager);
+        } catch (err) {
+            console.error('[FirebaseUI] Falha ao inicializar:', err);
+            window._fbUIInitialized = false; // permite retry na próxima tentativa
+        }
     };
 
     // Escuta evento disparado por firebase.js quando ele termina de carregar
@@ -644,6 +649,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Caso firebase.js já tenha executado antes desse listener ser registrado
     if (window.FirebaseService) initFirebaseUI();
+
+    // Fallback de segurança: se após 3s o Firebase ainda não inicializou, tenta novamente
+    setTimeout(() => {
+        if (!window._fbUIInitialized && window.FirebaseService) {
+            console.warn('[FirebaseUI] Retry de inicialização após timeout.');
+            initFirebaseUI();
+        }
+    }, 3000);
 
     // Console Easter Egg
     console.log('%c💺 ERGONOMIA NO TRABALHO DIGITAL', 'font-size: 20px; color: #10b981; font-weight: bold;');
@@ -674,7 +687,13 @@ class FirebaseUI {
     /* ── Auth ── */
     _watchAuth() {
         const svc = window.FirebaseService;
-        if (!svc) return;
+        if (!svc) {
+            // Retry when Firebase becomes available (handles slow/pending loads)
+            window.addEventListener('firebase-ready', (e) => {
+                if (!e.detail?.error) this._watchAuth();
+            }, { once: true });
+            return;
+        }
         svc.Auth.onStateChange((user, isAdmin) => {
             this.isAdmin = isAdmin;
             this._updateAdminUI(user, isAdmin);
@@ -1097,11 +1116,15 @@ class FirebaseUI {
 
     /* ── Salvar apresentação atual (DOM → Firebase) ── */
     _openSaveCurrentModal() {
-        const slides = document.querySelectorAll('.slides-container .slide');
-        document.getElementById('save-current-count').textContent = slides.length;
-        document.getElementById('save-current-title').value  = '';
-        document.getElementById('save-current-desc').value   = '';
-        document.getElementById('save-current-author').value = '';
+        const slides   = document.querySelectorAll('.slides-container .slide');
+        const countEl  = document.getElementById('save-current-count');
+        const titleEl  = document.getElementById('save-current-title');
+        const descEl   = document.getElementById('save-current-desc');
+        const authorEl = document.getElementById('save-current-author');
+        if (countEl)  countEl.textContent = slides.length;
+        if (titleEl)  titleEl.value  = '';
+        if (descEl)   descEl.value   = '';
+        if (authorEl) authorEl.value = '';
         document.getElementById('save-current-error')?.classList.add('hidden');
         this._closeModal('modal-presentations');
         this._openModal('modal-save-current');
@@ -1115,6 +1138,7 @@ class FirebaseUI {
         const btn    = document.getElementById('btn-confirm-save-current');
         const svc    = window.FirebaseService;
 
+        if (!svc)   return this._showErr(errBox, 'Firebase não conectado. Recarregue a página e tente novamente.');
         if (!title) return this._showErr(errBox, 'Informe o título da apresentação.');
 
         const slideEls = document.querySelectorAll('.slides-container .slide');
